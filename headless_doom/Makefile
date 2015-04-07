@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS2=-DHEADLESS -O0 -g -Wall -DFAIL_QUICKLY --save-temps $(CFLAGS)
+CFLAGS2=-DDOOM_TEST -DHEADLESS -O2 -g -Wall  $(CFLAGS)
 LDFLAGS=
 LIBS=
 
@@ -71,14 +71,31 @@ OBJS=				\
 		$(O)/sounds.o           \
         $(O)/i_main.o
 
-all: doom1.exe
+all: doom.exe doom.wad.ok DDQ-EP1.LMP DDQ-EP2.LMP DDQ-EP3.LMP DDQ-EP4.LMP
 
-doom1.exe: $(OBJS)
-	$(CC) -o doom1.exe $(OBJS) $(LDFLAGS) $(CFLAGS)
+doom.exe: $(OBJS)
+	$(CC) -o doom.exe $(OBJS) $(LDFLAGS) $(CFLAGS)
 
+doom.wad:
+	@echo ""
+	@echo "doom.wad not found. Please copy 'doom.wad' from Ultimate Doom."
+	@echo "See README.txt"
+	@echo ""
+	@false
+
+doom.wad.ok: doom.wad
+	md5sum -c doom.wad.md5
+	touch doom.wad.ok
+
+DDQ-EP1.LMP:
+	unzip -o -f DdQ-1941.zip
+
+DDQ-EP2.LMP: DDQ-EP1.LMP
+DDQ-EP3.LMP: DDQ-EP2.LMP
+DDQ-EP4.LMP: DDQ-EP3.LMP
 
 clean:
-	rm -f *.o *~ *.flc doom1.exe *.i
+	rm -f *.o *~ *.flc doom.exe *.i
 
 $(O)/%.o:	%.c
 	$(CC) $(CFLAGS2) -c $< -o $@
