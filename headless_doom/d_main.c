@@ -769,6 +769,7 @@ static struct timeval stop;
 unsigned headless_count;
 int root (void);
 
+// annotations for RVS tools - see www.rapitasystems.com
 #pragma RVS instrument ("main", "FALSE");
 #pragma RVS instrument ("goodbye", "FALSE");
 
