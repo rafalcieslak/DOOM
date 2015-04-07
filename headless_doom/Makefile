@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS2=-DDOOM_TEST -DHEADLESS -O2 -g -Wall  $(CFLAGS)
+CFLAGS2=-DHEADLESS -O2 -g -Wall  $(CFLAGS)
 LDFLAGS=
 LIBS=
 
@@ -13,7 +13,6 @@ OBJS=				\
 		$(O)/dstrings.o		\
 		$(O)/i_system.o		\
 		$(O)/i_sound.o		\
-		$(O)/i_video.o		\
 		$(O)/i_net.o			\
 		$(O)/tables.o			\
 		$(O)/f_finale.o		\
@@ -71,10 +70,14 @@ OBJS=				\
 		$(O)/sounds.o           \
         $(O)/i_main.o
 
-all: doom.exe doom.wad.ok DDQ-EP1.LMP DDQ-EP2.LMP DDQ-EP3.LMP DDQ-EP4.LMP
+all: benchmark.exe test.exe \
+    doom.wad.ok DDQ-EP1.LMP DDQ-EP2.LMP DDQ-EP3.LMP DDQ-EP4.LMP
 
-doom.exe: $(OBJS)
-	$(CC) -o doom.exe $(OBJS) $(LDFLAGS) $(CFLAGS)
+benchmark.exe: $(OBJS) i_video_benchmark.o
+	$(CC) -o benchmark.exe $(OBJS) i_video_benchmark.o $(LDFLAGS) $(CFLAGS)
+
+test.exe: $(OBJS) crc.o i_video_test.o
+	$(CC) -o test.exe $(OBJS) $(LDFLAGS) crc.o i_video_test.o $(CFLAGS)
 
 doom.wad:
 	@echo ""
@@ -88,14 +91,14 @@ doom.wad.ok: doom.wad
 	touch doom.wad.ok
 
 DDQ-EP1.LMP:
-	unzip -o -f DdQ-1941.zip
+	unzip -o DdQ-1941.zip
 
 DDQ-EP2.LMP: DDQ-EP1.LMP
 DDQ-EP3.LMP: DDQ-EP2.LMP
 DDQ-EP4.LMP: DDQ-EP3.LMP
 
 clean:
-	rm -f *.o *~ *.flc doom.exe *.i
+	rm -f *.o *~ *.flc test.exe benchmark.exe *.i doom.wad.ok
 
 $(O)/%.o:	%.c
 	$(CC) $(CFLAGS2) -c $< -o $@
