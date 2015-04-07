@@ -453,8 +453,8 @@ void R_InitPointToAngle (void)
 fixed_t R_ScaleFromGlobalAngle (angle_t visangle)
 {
     fixed_t		scale;
-    int			anglea;
-    int			angleb;
+    unsigned    anglea;
+    unsigned    angleb;
     int			sinea;
     int			sineb;
     fixed_t		num;

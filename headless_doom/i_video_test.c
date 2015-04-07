@@ -55,8 +55,6 @@ rcsid[] = "$Id: i_x.c,v 1.6 1997/02/03 22:45:10 b1 Exp $";
 
 #include "doomdef.h"
 
-#define POINTER_WARP_COUNTDOWN	1
-
 extern unsigned headless_count;
 
 static FILE * crc_out = NULL;
@@ -110,11 +108,29 @@ byte cur_palette [768];
 void I_FinishUpdate (void)
 {
     /* Here is where screens[0] is passed to CRC-32 */
-    unsigned crc;
+    unsigned crc, v1, v2;
 
+    v1 = v2 = 0;
     crc = crc32_8bytes (screens[0], SCREENHEIGHT * SCREENWIDTH, 0);
     headless_count ++;
+#ifdef WRITE_CRC
     fprintf (crc_out, "%08x %u\n", crc, headless_count);
+    fflush (crc_out);
+#else
+    if (2 != fscanf (crc_out, "%08x %u", &v1, &v2)) {
+        I_Error ("Couldn't read CRC and frame number from 'crc.dat' frame %u",
+                headless_count);
+    }
+    if (v2 != headless_count) {
+        I_Error ("Incorrect frame number in 'crc.dat', expected %u got %u",
+                headless_count, v2);
+    }
+    if (v1 != crc) {
+        I_Error ("Incorrect CRC-32, frame %u, "
+                 "expected %08x got %08x",
+                headless_count, v1, crc);
+    }
+#endif
 #if 0
     if (headless_count >= MAX_CHECKED_FRAMES) {
         I_Error ("Unable to access 'crc.dat'");
@@ -127,7 +143,6 @@ void I_FinishUpdate (void)
         headless_failed ++ ;
     }
 #endif
-    headless_count ++ ;
 
 #ifdef WRITE_BINS
     if ((headless_count % 10) == 0) {
@@ -180,10 +195,15 @@ void I_InitGraphics(void)
 
 	screens[0] = (unsigned char *) malloc (SCREENWIDTH * SCREENHEIGHT);
 
+#ifdef WRITE_CRC
+    printf ("Headless Doom running in Test (write) mode\n");
     crc_out = fopen ("crc.dat", "wt");
+#else
+    printf ("Headless Doom running in Test mode\n");
+    crc_out = fopen ("crc.dat", "rt");
+#endif
     if (!crc_out) {
         I_Error ("Unable to access 'crc.dat'");
     }
-    printf ("Headless Doom running in Test mode\n");
 }
 
