@@ -21,6 +21,7 @@
 //
 //-----------------------------------------------------------------------------
 
+#include <stdint.h>
 static const char
 rcsid[] = "$Id: z_zone.c,v 1.4 1997/02/03 16:47:58 b1 Exp $";
 
@@ -192,7 +193,7 @@ Z_Malloc
     memblock_t* newblock;
     memblock_t*	base;
 
-    size = (size + 3) & ~3;
+    size = (size + 7) & ~7;
     
     // scan through the block list,
     // looking for the first free block
@@ -437,7 +438,7 @@ Z_ChangeTag2
     if (block->id != ZONEID)
 	I_Error ("Z_ChangeTag: freed a pointer without ZONEID");
 
-    if (tag >= PU_PURGELEVEL && (unsigned)block->user < 0x100)
+    if (tag >= PU_PURGELEVEL && (unsigned) ( (intptr_t) block->user ) < 0x100)
 	I_Error ("Z_ChangeTag: an owner is required for purgable blocks");
 
     block->tag = tag;

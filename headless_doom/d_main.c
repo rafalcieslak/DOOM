@@ -24,6 +24,8 @@
 //
 //-----------------------------------------------------------------------------
 
+#pragma RVS add_code ("#include \"rvs_c_map.h\"");
+
 
 static const char rcsid[] = "$Id: d_main.c,v 1.8 1997/02/03 22:45:09 b1 Exp $";
 
@@ -31,15 +33,15 @@ static const char rcsid[] = "$Id: d_main.c,v 1.8 1997/02/03 22:45:09 b1 Exp $";
 #define	FGCOLOR		8
 
 
-#ifdef NORMALUNIX
+#ifdef HEADLESS  
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <sys/time.h>
 #endif
-
 
 #include "doomdef.h"
 #include "doomstat.h"
@@ -77,6 +79,7 @@ static const char rcsid[] = "$Id: d_main.c,v 1.8 1997/02/03 22:45:09 b1 Exp $";
 
 #include "d_main.h"
 
+
 //
 // D-DoomLoop()
 // Not a globally visible function,
@@ -86,7 +89,7 @@ static const char rcsid[] = "$Id: d_main.c,v 1.8 1997/02/03 22:45:09 b1 Exp $";
 //  calls all ?_Responder, ?_Ticker, and ?_Drawer,
 //  calls I_GetTime, I_StartFrame, and I_StartTic
 //
-void D_DoomLoop (void);
+// void D_DoomLoop (void);
 
 
 char*		wadfiles[MAXWADFILES];
@@ -99,7 +102,7 @@ boolean         fastparm;	// checkparm of -fast
 
 boolean         drone;
 
-boolean		singletics = false; // debug flag to cancel adaptiveness
+boolean		singletics = true; // debug flag to cancel adaptiveness
 
 
 
@@ -150,7 +153,7 @@ int 		eventtail;
 void D_PostEvent (event_t* ev)
 {
     events[eventhead] = *ev;
-    eventhead = (++eventhead)&(MAXEVENTS-1);
+    eventhead = (eventhead + 1)&(MAXEVENTS-1);
 }
 
 
@@ -167,7 +170,7 @@ void D_ProcessEvents (void)
 	 && (W_CheckNumForName("map01")<0) )
       return;
 	
-    for ( ; eventtail != eventhead ; eventtail = (++eventtail)&(MAXEVENTS-1) )
+    for ( ; eventtail != eventhead ; eventtail = (eventtail + 1)&(MAXEVENTS-1) )
     {
 	ev = &events[eventtail];
 	if (M_Responder (ev))
@@ -351,60 +354,6 @@ void D_Display (void)
 //
 extern  boolean         demorecording;
 
-void D_DoomLoop (void)
-{
-    if (demorecording)
-	G_BeginRecording ();
-		
-    if (M_CheckParm ("-debugfile"))
-    {
-	char    filename[20];
-	sprintf (filename,"debug%i.txt",consoleplayer);
-	printf ("debug output to: %s\n",filename);
-	debugfile = fopen (filename,"w");
-    }
-	
-    I_InitGraphics ();
-
-    while (1)
-    {
-	// frame syncronous IO operations
-	I_StartFrame ();                
-	
-	// process one or more tics
-	if (singletics)
-	{
-	    I_StartTic ();
-	    D_ProcessEvents ();
-	    G_BuildTiccmd (&netcmds[consoleplayer][maketic%BACKUPTICS]);
-	    if (advancedemo)
-		D_DoAdvanceDemo ();
-	    M_Ticker ();
-	    G_Ticker ();
-	    gametic++;
-	    maketic++;
-	}
-	else
-	{
-	    TryRunTics (); // will run at least one tic
-	}
-		
-	S_UpdateSounds (players[consoleplayer].mo);// move positional sounds
-
-	// Update display, next frame, with current state.
-	D_Display ();
-
-#ifndef SNDSERV
-	// Sound mixing for the buffer is snychronous.
-	I_UpdateSound();
-#endif	
-	// Synchronous sound output is explicitly called.
-#ifndef SNDINTR
-	// Update sound output.
-	I_SubmitSound();
-#endif
-    }
-}
 
 
 
@@ -459,61 +408,71 @@ void D_AdvanceDemo (void)
     paused = false;
     gameaction = ga_nothing;
 
+#if 0
     if ( gamemode == retail )
       demosequence = (demosequence+1)%7;
     else
       demosequence = (demosequence+1)%6;
+#endif
+    demosequence++;
+    printf ("demo sequence %d\n", demosequence);
     
     switch (demosequence)
     {
       case 0:
-	if ( gamemode == commercial )
-	    pagetic = 35 * 11;
-	else
-	    pagetic = 170;
-	gamestate = GS_DEMOSCREEN;
-	pagename = "TITLEPIC";
-	if ( gamemode == commercial )
-	  S_StartMusic(mus_dm2ttl);
-	else
-	  S_StartMusic (mus_intro);
-	break;
+        if ( gamemode == commercial )
+            pagetic = 35 * 11;
+        else
+            pagetic = 170;
+        gamestate = GS_DEMOSCREEN;
+        pagetic = 5;
+        pagename = "TITLEPIC";
+        if ( gamemode == commercial )
+          S_StartMusic(mus_dm2ttl);
+        else
+          S_StartMusic (mus_intro);
+        break;
       case 1:
-	G_DeferedPlayDemo ("demo1");
-	break;
+        G_DeferedPlayDemo ("DDQ-EP1");
+        break;
       case 2:
-	pagetic = 200;
-	gamestate = GS_DEMOSCREEN;
-	pagename = "CREDIT";
-	break;
+        pagetic = 200;
+        gamestate = GS_DEMOSCREEN;
+        pagename = "CREDIT";
+        pagetic = 5;
+        break;
       case 3:
-	G_DeferedPlayDemo ("demo2");
-	break;
+        G_DeferedPlayDemo ("DDQ-EP2");
+        break;
       case 4:
-	gamestate = GS_DEMOSCREEN;
-	if ( gamemode == commercial)
-	{
-	    pagetic = 35 * 11;
-	    pagename = "TITLEPIC";
-	    S_StartMusic(mus_dm2ttl);
-	}
-	else
-	{
-	    pagetic = 200;
+        gamestate = GS_DEMOSCREEN;
+        if ( gamemode == commercial)
+        {
+            pagetic = 35 * 11;
+            pagename = "TITLEPIC";
+            S_StartMusic(mus_dm2ttl);
+        }
+        else
+        {
+            pagetic = 200;
 
-	    if ( gamemode == retail )
-	      pagename = "CREDIT";
-	    else
-	      pagename = "HELP2";
-	}
-	break;
+            if ( gamemode == retail )
+              pagename = "CREDIT";
+            else
+              pagename = "HELP2";
+        }
+        pagetic = 5;
+        break;
       case 5:
-	G_DeferedPlayDemo ("demo3");
-	break;
+        G_DeferedPlayDemo ("DDQ-EP3");
+        break;
         // THE DEFINITIVE DOOM Special Edition demo
       case 6:
-	G_DeferedPlayDemo ("demo4");
-	break;
+        G_DeferedPlayDemo ("DDQ-EP4");
+        break;
+      default:
+        printf ("end of demos\n");
+        exit (0);
     }
 }
 
@@ -563,22 +522,23 @@ void D_AddFile (char *file)
 void IdentifyVersion (void)
 {
 
-    char*	doom1wad;
-    char*	doomwad;
-    char*	doomuwad;
-    char*	doom2wad;
+    char*	doom1wad = NULL;
+    char*	doomwad = NULL;
+    char*	doomuwad = NULL;
+    char*	doom2wad = NULL;
 
-    char*	doom2fwad;
-    char*	plutoniawad;
-    char*	tntwad;
+    char*	doom2fwad = NULL;
+    char*	plutoniawad = NULL;
+    char*	tntwad = NULL;
 
-#ifdef NORMALUNIX
+#ifdef HEADLESS  
     char *home;
     char *doomwaddir;
-    doomwaddir = getenv("DOOMWADDIR");
-    if (!doomwaddir)
+    /*doomwaddir = getenv("DOOMWADDIR");
+    if (!doomwaddir)*/
 	doomwaddir = ".";
 
+#if 0
     // Commercial.
     doom2wad = malloc(strlen(doomwaddir)+1+9+1);
     sprintf(doom2wad, "%s/doom2.wad", doomwaddir);
@@ -590,7 +550,7 @@ void IdentifyVersion (void)
     // Registered.
     doomwad = malloc(strlen(doomwaddir)+1+8+1);
     sprintf(doomwad, "%s/doom.wad", doomwaddir);
-    
+
     // Shareware.
     doom1wad = malloc(strlen(doomwaddir)+1+9+1);
     sprintf(doom1wad, "%s/doom1.wad", doomwaddir);
@@ -607,13 +567,19 @@ void IdentifyVersion (void)
     // French stuff.
     doom2fwad = malloc(strlen(doomwaddir)+1+10+1);
     sprintf(doom2fwad, "%s/doom2f.wad", doomwaddir);
-
-    home = getenv("HOME");
-    if (!home)
-      I_Error("Please set $HOME to your home directory");
-    sprintf(basedefault, "%s/.doomrc", home);
 #endif
 
+    sprintf(basedefault, "doomrc");
+#endif
+
+#if 1
+    gamemode = retail;
+    D_AddFile ("doom.wad");
+    D_AddFile ("DDQ-EP1.LMP");
+    D_AddFile ("DDQ-EP2.LMP");
+    D_AddFile ("DDQ-EP3.LMP");
+    D_AddFile ("DDQ-EP4.LMP");
+#else
     if (M_CheckParm ("-shdev"))
     {
 	gamemode = shareware;
@@ -710,6 +676,7 @@ void IdentifyVersion (void)
 
     printf("Game mode indeterminate.\n");
     gamemode = indetermined;
+#endif
 
     // We don't abort. Let's see what the PWAD contains.
     //exit(1);
@@ -793,16 +760,54 @@ void FindResponseFile (void)
 //
 // D_DoomMain
 //
-void D_DoomMain (void)
+//void D_DoomMain (void)
+
+static char * s_argv[] = { "doom", NULL };
+
+static struct timeval start;
+static struct timeval stop;
+unsigned headless_count;
+int root (void);
+
+#pragma RVS instrument ("main", "FALSE");
+#pragma RVS instrument ("goodbye", "FALSE");
+
+void goodbye (void)
+{
+   double total;
+
+   gettimeofday (&stop, NULL);
+#pragma RVS add_statement ("RVS_Output()");
+   stop.tv_sec -= start.tv_sec;
+   start.tv_sec = 0;
+   total = (((double) stop.tv_sec) + (((double) stop.tv_usec) / 1e6)) -
+         (((double) start.tv_sec) + (((double) start.tv_usec) / 1e6));
+   printf ("total time: %7.3f seconds, frames %u\n",
+            total, headless_count);
+}
+
+int main(int argc, char ** argv)
+{
+    int rc;
+    atexit (goodbye);
+    headless_count = 0;
+#pragma RVS add_statement ("RVS_Init()");
+    gettimeofday (&start, NULL);
+    return root ();
+}
+
+int root (void)
 {
     int             p;
-    char                    file[256];
+    char            file[256];
+
+    myargc = 1;
+    myargv = s_argv; 
 
     FindResponseFile ();
 	
     IdentifyVersion ();
 	
-    setbuf (stdout, NULL);
     modifiedgame = false;
 	
     nomonsters = M_CheckParm ("-nomonsters");
@@ -826,7 +831,7 @@ void D_DoomMain (void)
       case shareware:
 	sprintf (title,
 		 "                            "
-		 "DOOM Shareware Startup v%i.%i"
+		 "Headless DOOM Startup v%i.%i"
 		 "                           ",
 		 VERSION/100,VERSION%100);
 	break;
@@ -873,13 +878,15 @@ void D_DoomMain (void)
 
     if (devparm)
 	printf(D_DEVSTR);
-    
+   
+#if 0
     if (M_CheckParm("-cdrom"))
     {
 	printf(D_CDROM);
 	mkdir("c:\\doomdata",0);
 	strcpy (basedefault,"c:/doomdata/default.cfg");
     }	
+#endif
     
     // turbo option
     if ( (p=M_CheckParm ("-turbo")) )
@@ -1112,6 +1119,7 @@ void D_DoomMain (void)
     printf ("ST_Init: Init status bar.\n");
     ST_Init ();
 
+#if 0
     // check for a driver that wants intermission stats
     p = M_CheckParm ("-statcopy");
     if (p && p<myargc-1)
@@ -1122,7 +1130,7 @@ void D_DoomMain (void)
 	statcopy = (void*)atoi(myargv[p+1]);
 	printf ("External statistics registered.\n");
     }
-    
+   
     // start the apropriate game based on parms
     p = M_CheckParm ("-record");
 
@@ -1156,6 +1164,7 @@ void D_DoomMain (void)
 	    sprintf(file, SAVEGAMENAME"%c.dsg",myargv[p+1][0]);
 	G_LoadGame (file);
     }
+#endif
 	
 
     if ( gameaction != ga_loadgame )
@@ -1167,5 +1176,62 @@ void D_DoomMain (void)
 
     }
 
-    D_DoomLoop ();  // never returns
+    // D_DoomLoop ();  // never returns
+    {
+        printf("Enter D_DoomLoop()\n");
+
+        if (demorecording)
+        G_BeginRecording ();
+            
+        if (M_CheckParm ("-debugfile"))
+        {
+            char    filename[20];
+            sprintf (filename,"debug%i.txt",consoleplayer);
+            printf ("debug output to: %s\n",filename);
+            debugfile = fopen (filename,"w");
+        }
+        
+        I_InitGraphics ();
+
+
+        while (1) {
+            // frame syncronous IO operations
+            I_StartFrame ();                
+            
+            // process one or more tics
+            if (singletics)
+            {
+                I_StartTic ();
+                D_ProcessEvents ();
+                G_BuildTiccmd (&netcmds[consoleplayer][maketic%BACKUPTICS]);
+                if (advancedemo)
+                D_DoAdvanceDemo ();
+                M_Ticker ();
+                G_Ticker ();
+                gametic++;
+                maketic++;
+            }
+            else
+            {
+                TryRunTics (); // will run at least one tic
+            }
+                
+            S_UpdateSounds (players[consoleplayer].mo);// move positional sounds
+
+            // Update display, next frame, with current state.
+            D_Display ();
+
+#ifndef SNDSERV
+            // Sound mixing for the buffer is snychronous.
+            I_UpdateSound();
+#endif	
+            // Synchronous sound output is explicitly called.
+#ifndef SNDINTR
+            // Update sound output.
+            I_SubmitSound();
+#endif
+        }
+    }
+
+    return 0;
 }

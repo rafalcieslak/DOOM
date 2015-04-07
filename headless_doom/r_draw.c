@@ -23,6 +23,7 @@
 //
 //-----------------------------------------------------------------------------
 
+#include <stdint.h>
 
 static const char
 rcsid[] = "$Id: r_draw.c,v 1.4 1997/02/03 16:47:55 b1 Exp $";
@@ -132,6 +133,17 @@ void R_DrawColumn (void)
     fracstep = dc_iscale; 
     frac = dc_texturemid + (dc_yl-centery)*fracstep; 
 
+    // If the position is before the start of the column, fill
+    // with black to avoid accessing undefined memory (before dc_source)
+    while (frac < 0) {
+        *dest = 0;
+        dest += SCREENWIDTH; 
+        frac += fracstep;
+        count --;
+
+        if (count < 0) return;
+    }
+
     // Inner loop that does the actual texture mapping,
     //  e.g. a DDA-lile scaling.
     // This is as fast as it gets.
@@ -139,7 +151,10 @@ void R_DrawColumn (void)
     {
 	// Re-map color indices from wall texture column
 	//  using a lighting/special effects LUT.
-	*dest = dc_colormap[dc_source[(frac>>FRACBITS)&127]];
+        byte x = (frac>>FRACBITS)&127;
+        x = dc_source[x];
+        x = dc_colormap[x];
+        *dest = x;
 	
 	dest += SCREENWIDTH; 
 	frac += fracstep;
@@ -461,7 +476,7 @@ void R_InitTranslationTables (void)
     int		i;
 	
     translationtables = Z_Malloc (256*3+255, PU_STATIC, 0);
-    translationtables = (byte *)(( (int)translationtables + 255 )& ~255);
+    translationtables = (byte *)(( (intptr_t)translationtables + 255 )& ~255);
     
     // translate just the 16 green colors
     for (i=0 ; i<256 ; i++)

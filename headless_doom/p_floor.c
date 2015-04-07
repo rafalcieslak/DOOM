@@ -467,8 +467,8 @@ EV_BuildStairs
 
     floormove_t*	floor;
     
-    fixed_t		stairsize;
-    fixed_t		speed;
+    fixed_t		stairsize = 0;
+    fixed_t		speed = 0;
 
     secnum = -1;
     rtn = 0;
@@ -536,6 +536,7 @@ EV_BuildStairs
 		sec = tsec;
 		secnum = newsecnum;
 		floor = Z_Malloc (sizeof(*floor), PU_LEVSPEC, 0);
+		memset (floor, 0, sizeof(*floor));
 
 		P_AddThinker (&floor->thinker);
 

@@ -33,20 +33,21 @@ rcsid[] = "$Id: i_unix.c,v 1.5 1997/02/03 22:45:10 b1 Exp $";
 #include <sys/time.h>
 #include <sys/types.h>
 
-#ifndef LINUX
+#ifndef HEADLESS  
 #include <sys/filio.h>
 #endif
 
 #include <fcntl.h>
 #include <unistd.h>
-#include <sys/ioctl.h>
+// #include <sys/ioctl.h>
 
 // Linux voxware output.
-#include <linux/soundcard.h>
+//#include <linux/soundcard.h>
 
 // Timer stuff. Experimental.
 #include <time.h>
 #include <signal.h>
+#include <errno.h>
 
 #include "z_zone.h"
 
@@ -162,16 +163,17 @@ myioctl
   int	command,
   int*	arg )
 {   
+#ifndef FAKE_SOUND
     int		rc;
-    extern int	errno;
     
     rc = ioctl(fd, command, arg);  
     if (rc < 0)
     {
-	fprintf(stderr, "ioctl(dsp,%d,arg) failed\n", command);
-	fprintf(stderr, "errno=%d\n", errno);
+	fprintf(stdout, "ioctl(dsp,%d,arg) failed\n", command);
+	fprintf(stdout, "errno=%d\n", errno);
 	exit(-1);
     }
+#endif
 }
 
 
@@ -218,10 +220,10 @@ getsfx
     size = W_LumpLength( sfxlump );
 
     // Debug.
-    // fprintf( stderr, "." );
-    //fprintf( stderr, " -loading  %s (lump %d, %d bytes)\n",
+    // fprintf( stdout, "." );
+    //fprintf( stdout, " -loading  %s (lump %d, %d bytes)\n",
     //	     sfxname, sfxlump, size );
-    //fflush( stderr );
+    //fflush( stdout );
     
     sfx = (unsigned char*)W_CacheLumpNum( sfxlump, PU_STATIC );
 
@@ -411,8 +413,8 @@ void I_SetChannels()
 
   // This table provides step widths for pitch parameters.
   // I fail to see that this is currently used.
-  for (i=-128 ; i<128 ; i++)
-    steptablemid[i] = (int)(pow(2.0, (i/64.0))*65536.0);
+  //for (i=-128 ; i<128 ; i++)
+  //  steptablemid[i] = (int)(pow(2.0, (i/64.0))*65536.0);
   
   
   // Generates volume lookup tables
@@ -489,12 +491,12 @@ I_StartSound
     return id;
 #else
     // Debug.
-    //fprintf( stderr, "starting sound %d", id );
+    //fprintf( stdout, "starting sound %d", id );
     
     // Returns a handle (not used).
     id = addsfx( id, vol, steptable[pitch], sep );
 
-    // fprintf( stderr, "/handle is %d\n", id );
+    // fprintf( stdout, "/handle is %d\n", id );
     
     return id;
 #endif
@@ -634,6 +636,9 @@ void I_UpdateSound( void )
 	rightout += step;
     }
 
+#ifdef FAKE_SOUND
+#else
+
 #ifdef SNDINTR
     // Debug check.
     if ( flag )
@@ -644,12 +649,13 @@ void I_UpdateSound( void )
     
     if ( misses > 10 )
     {
-      fprintf( stderr, "I_SoundUpdate: missed 10 buffer writes\n");
+      fprintf( stdout, "I_SoundUpdate: missed 10 buffer writes\n");
       misses = 0;
     }
     
     // Increment flag for update.
     flag++;
+#endif
 #endif
 }
 
@@ -666,7 +672,9 @@ void
 I_SubmitSound(void)
 {
   // Write it to DSP device.
+#ifndef FAKE_SOUND
   write(audio_fd, mixbuffer, SAMPLECOUNT*BUFMUL);
+#endif
 }
 
 
@@ -706,8 +714,8 @@ void I_ShutdownSound(void)
   
 
   // FIXME (below).
-  fprintf( stderr, "I_ShutdownSound: NOT finishing pending sounds\n");
-  fflush( stderr );
+  fprintf( stdout, "I_ShutdownSound: NOT finishing pending sounds\n");
+  fflush( stdout );
   
   while ( !done )
   {
@@ -722,7 +730,9 @@ void I_ShutdownSound(void)
 #endif
   
   // Cleaning up -releasing the DSP device.
+#ifndef FAKE_SOUND
   close ( audio_fd );
+#endif
 #endif
 
   // Done.
@@ -754,22 +764,26 @@ I_InitSound()
     sndserver = popen(buffer, "w");
   }
   else
-    fprintf(stderr, "Could not start sound server [%s]\n", buffer);
+    fprintf(stdout, "Could not start sound server [%s]\n", buffer);
 #else
     
   int i;
   
 #ifdef SNDINTR
-  fprintf( stderr, "I_SoundSetTimer: %d microsecs\n", SOUND_INTERVAL );
+  fprintf( stdout, "I_SoundSetTimer: %d microsecs\n", SOUND_INTERVAL );
   I_SoundSetTimer( SOUND_INTERVAL );
 #endif
     
   // Secure and configure sound device first.
-  fprintf( stderr, "I_InitSound: ");
-  
+  fprintf( stdout, "I_InitSound: ");
+ 
+#ifdef FAKE_SOUND
+  audio_fd = -1;
+  fprintf(stdout, " faked\n" );
+#else
   audio_fd = open("/dev/dsp", O_WRONLY);
   if (audio_fd<0)
-    fprintf(stderr, "Could not open /dev/dsp\n");
+    fprintf(stdout, "Could not open /dev/dsp\n");
   
                      
   i = 11 | (2<<16);                                           
@@ -788,13 +802,14 @@ I_InitSound()
   if (i&=AFMT_S16_LE)    
     myioctl(audio_fd, SNDCTL_DSP_SETFMT, &i);
   else
-    fprintf(stderr, "Could not play signed 16 data\n");
+    fprintf(stdout, "Could not play signed 16 data\n");
 
-  fprintf(stderr, " configured audio device\n" );
+  fprintf(stdout, " configured audio device\n" );
+#endif
 
     
   // Initialize external data (all sounds) at start, keep static.
-  fprintf( stderr, "I_InitSound: ");
+  fprintf( stdout, "I_InitSound: ");
   
   for (i=1 ; i<NUMSFX ; i++)
   { 
@@ -812,14 +827,14 @@ I_InitSound()
     }
   }
 
-  fprintf( stderr, " pre-cached all sound data\n");
+  fprintf( stdout, " pre-cached all sound data\n");
   
   // Now initialize mixbuffer with zero.
   for ( i = 0; i< MIXBUFFERSIZE; i++ )
     mixbuffer[i] = 0;
   
   // Finished initialization.
-  fprintf(stderr, "I_InitSound: sound module ready\n");
+  fprintf(stdout, "I_InitSound: sound module ready\n");
     
 #endif
 }
@@ -909,22 +924,24 @@ int I_QrySongPlaying(int handle)
 //  time independend timer happens to get lost due to heavy load.
 // SIGALRM and ITIMER_REAL doesn't really work well.
 // There are issues with profiling as well.
-static int /*__itimer_which*/  itimer = ITIMER_REAL;
+//static int /*__itimer_which*/  itimer = ITIMER_REAL;
 
-static int sig = SIGALRM;
+//static int sig = SIGALRM;
 
 // Interrupt handler.
 void I_HandleSoundTimer( int ignore )
 {
   // Debug.
-  //fprintf( stderr, "%c", '+' ); fflush( stderr );
+  //fprintf( stdout, "%c", '+' ); fflush( stdout );
   
   // Feed sound device if necesary.
   if ( flag )
   {
     // See I_SubmitSound().
     // Write it to DSP device.
+#ifndef FAKE_SOUND
     write(audio_fd, mixbuffer, SAMPLECOUNT*BUFMUL);
+#endif
 
     // Reset flag counter.
     flag = 0;
@@ -940,6 +957,9 @@ void I_HandleSoundTimer( int ignore )
 // Get the interrupt. Set duration in millisecs.
 int I_SoundSetTimer( int duration_of_tick )
 {
+#ifdef FAKE_SOUND
+    return 0;
+#else
   // Needed for gametick clockwork.
   struct itimerval    value;
   struct itimerval    ovalue;
@@ -970,9 +990,10 @@ int I_SoundSetTimer( int duration_of_tick )
 
   // Debug.
   if ( res == -1 )
-    fprintf( stderr, "I_SoundSetTimer: interrupt n.a.\n");
+    fprintf( stdout, "I_SoundSetTimer: interrupt n.a.\n");
   
   return res;
+#endif
 }
 
 
@@ -981,5 +1002,5 @@ void I_SoundDelTimer()
 {
   // Debug.
   if ( I_SoundSetTimer( 0 ) == -1)
-    fprintf( stderr, "I_SoundDelTimer: failed to remove interrupt. Doh!\n");
+    fprintf( stdout, "I_SoundDelTimer: failed to remove interrupt. Doh!\n");
 }

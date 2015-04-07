@@ -25,7 +25,6 @@
 
 static const char rcsid[] = "$Id: d_net.c,v 1.3 1997/02/03 22:01:47 b1 Exp $";
 
-
 #include "m_menu.h"
 #include "i_system.h"
 #include "i_video.h"
@@ -89,7 +88,7 @@ doomdata_t	reboundstore;
 //
 int NetbufferSize (void)
 {
-    return (int)&(((doomdata_t *)0)->cmds[netbuffer->numtics]); 
+    return 0; /* (int)&(((doomdata_t *)0)->cmds[netbuffer->numtics]);  */
 }
 
 //
@@ -97,13 +96,14 @@ int NetbufferSize (void)
 //
 unsigned NetbufferChecksum (void)
 {
+#if 0
     unsigned		c;
     int		i,l;
 
     c = 0x1234567;
 
     // FIXME -endianess?
-#ifdef NORMALUNIX
+#ifdef HEADLESS  
     return 0;			// byte order problems
 #endif
 
@@ -112,6 +112,8 @@ unsigned NetbufferChecksum (void)
 	c += ((unsigned *)&netbuffer->retransmitfrom)[i] * (i+1);
 
     return c & NCMD_CHECKSUM;
+#endif
+    return 0;
 }
 
 //
@@ -144,6 +146,7 @@ HSendPacket
  (int	node,
   int	flags )
 {
+#if 0
     netbuffer->checksum = NetbufferChecksum () | flags;
 
     if (!node)
@@ -183,6 +186,7 @@ HSendPacket
     }
 
     I_NetCmd ();
+#endif
 }
 
 //
@@ -191,6 +195,8 @@ HSendPacket
 //
 boolean HGetPacket (void)
 {	
+    return false;
+#if 0
     if (reboundpacket)
     {
 	*netbuffer = reboundstore;
@@ -250,6 +256,7 @@ boolean HGetPacket (void)
 	}
     }
     return true;	
+#endif
 }
 
 
@@ -461,7 +468,7 @@ void CheckAbort (void)
 	
     I_StartTic ();
     for ( ; eventtail != eventhead 
-	      ; eventtail = (++eventtail)&(MAXEVENTS-1) ) 
+	      ; eventtail = (eventtail + 1)&(MAXEVENTS-1) ) 
     { 
 	ev = &events[eventtail]; 
 	if (ev->type == ev_keydown && ev->data1 == KEY_ESCAPE)
@@ -590,7 +597,6 @@ void D_CheckNetGame (void)
 	
     printf ("player %i of %i (%i nodes)\n",
 	    consoleplayer+1, doomcom->numplayers, doomcom->numnodes);
-
 }
 
 

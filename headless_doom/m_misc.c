@@ -34,6 +34,7 @@ rcsid[] = "$Id: m_misc.c,v 1.6 1997/02/03 22:45:10 b1 Exp $";
 #include <unistd.h>
 
 #include <ctype.h>
+#include <stdint.h>
 
 
 #include "doomdef.h"
@@ -213,7 +214,7 @@ extern char*	sndserver_filename;
 extern int	mb_used;
 #endif
 
-#ifdef LINUX
+#ifdef HEADLESS  
 char*		mousetype;
 char*		mousedev;
 #endif
@@ -225,8 +226,8 @@ extern char*	chat_macros[];
 typedef struct
 {
     char*	name;
-    int*	location;
-    int		defaultvalue;
+    int*    location;
+    int	    defaultvalue;
     int		scantranslate;		// PC scan code hack
     int		untranslated;		// lousy hack
 } default_t;
@@ -239,7 +240,7 @@ default_t	defaults[] =
     {"show_messages",&showMessages, 1},
     
 
-#ifdef NORMALUNIX
+#ifdef HEADLESS  
     {"key_right",&key_right, KEY_RIGHTARROW},
     {"key_left",&key_left, KEY_LEFTARROW},
     {"key_up",&key_up, KEY_UPARROW},
@@ -260,9 +261,9 @@ default_t	defaults[] =
     
 #endif
 
-#ifdef LINUX
-    {"mousedev", (int*)&mousedev, (int)"/dev/ttyS0"},
-    {"mousetype", (int*)&mousetype, (int)"microsoft"},
+#ifdef HEADLESS  
+    /*{"mousedev", (int64_t*)&mousedev, (int64_t)"/dev/ttyS0"},
+    {"mousetype", (int64_t*)&mousetype, (int64_t)"microsoft"},*/
 #endif
 
     {"use_mouse",&usemouse, 1},
@@ -285,17 +286,17 @@ default_t	defaults[] =
 
     {"usegamma",&usegamma, 0},
 
-    {"chatmacro0", (int *) &chat_macros[0], (int) HUSTR_CHATMACRO0 },
-    {"chatmacro1", (int *) &chat_macros[1], (int) HUSTR_CHATMACRO1 },
-    {"chatmacro2", (int *) &chat_macros[2], (int) HUSTR_CHATMACRO2 },
-    {"chatmacro3", (int *) &chat_macros[3], (int) HUSTR_CHATMACRO3 },
-    {"chatmacro4", (int *) &chat_macros[4], (int) HUSTR_CHATMACRO4 },
-    {"chatmacro5", (int *) &chat_macros[5], (int) HUSTR_CHATMACRO5 },
-    {"chatmacro6", (int *) &chat_macros[6], (int) HUSTR_CHATMACRO6 },
-    {"chatmacro7", (int *) &chat_macros[7], (int) HUSTR_CHATMACRO7 },
-    {"chatmacro8", (int *) &chat_macros[8], (int) HUSTR_CHATMACRO8 },
-    {"chatmacro9", (int *) &chat_macros[9], (int) HUSTR_CHATMACRO9 }
-
+    /*{"chatmacro0", (int64_t *) &chat_macros[0], (int64_t) HUSTR_CHATMACRO0 },
+    {"chatmacro1", (int64_t *) &chat_macros[1], (int64_t) HUSTR_CHATMACRO1 },
+    {"chatmacro2", (int64_t *) &chat_macros[2], (int64_t) HUSTR_CHATMACRO2 },
+    {"chatmacro3", (int64_t *) &chat_macros[3], (int64_t) HUSTR_CHATMACRO3 },
+    {"chatmacro4", (int64_t *) &chat_macros[4], (int64_t) HUSTR_CHATMACRO4 },
+    {"chatmacro5", (int64_t *) &chat_macros[5], (int64_t) HUSTR_CHATMACRO5 },
+    {"chatmacro6", (int64_t *) &chat_macros[6], (int64_t) HUSTR_CHATMACRO6 },
+    {"chatmacro7", (int64_t *) &chat_macros[7], (int64_t) HUSTR_CHATMACRO7 },
+    {"chatmacro8", (int64_t *) &chat_macros[8], (int64_t) HUSTR_CHATMACRO8 },
+    {"chatmacro9", (int64_t *) &chat_macros[9], (int64_t) HUSTR_CHATMACRO9 }
+*/
 };
 
 int	numdefaults;
@@ -307,10 +308,11 @@ char*	defaultfile;
 //
 void M_SaveDefaults (void)
 {
+#if 0
     int		i;
     int		v;
     FILE*	f;
-	
+
     f = fopen (defaultfile, "w");
     if (!f)
 	return; // can't write the file, but don't complain
@@ -329,6 +331,7 @@ void M_SaveDefaults (void)
     }
 	
     fclose (f);
+#endif
 }
 
 
@@ -348,10 +351,15 @@ void M_LoadDefaults (void)
     int		parm;
     boolean	isstring;
     
+    mousetype = "microsoft" ;
+    mousedev = "/dev/ttyS0";
+
     // set everything to base values
     numdefaults = sizeof(defaults)/sizeof(defaults[0]);
     for (i=0 ; i<numdefaults ; i++)
-	*defaults[i].location = defaults[i].defaultvalue;
+    {
+        *defaults[i].location = defaults[i].defaultvalue;
+    }
     
     // check for a custom default file
     i = M_CheckParm ("-config");
@@ -364,7 +372,7 @@ void M_LoadDefaults (void)
 	defaultfile = basedefault;
     
     // read the file in, overriding any set defaults
-    f = fopen (defaultfile, "r");
+    f = NULL; /* fopen (defaultfile, "r"); */
     if (f)
     {
 	while (!feof(f))
@@ -388,11 +396,10 @@ void M_LoadDefaults (void)
 		for (i=0 ; i<numdefaults ; i++)
 		    if (!strcmp(def, defaults[i].name))
 		    {
-			if (!isstring)
+			if (!isstring) {
 			    *defaults[i].location = parm;
-			else
-			    *defaults[i].location =
-				(int) newstring;
+			} else {}
+			    /* *defaults[i].location = (int *) newstring; */
 			break;
 		    }
 	    }

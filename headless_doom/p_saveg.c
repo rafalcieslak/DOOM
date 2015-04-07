@@ -34,6 +34,7 @@ rcsid[] = "$Id: p_tick.c,v 1.4 1997/02/03 16:47:55 b1 Exp $";
 
 byte*		save_p;
 
+#if 0
 
 // Pads save_p to a 4-byte boundary
 //  so that the load/save works on SGI&Gecko.
@@ -583,4 +584,14 @@ void P_UnArchiveSpecials (void)
     }
 
 }
+#endif
+
+void P_ArchivePlayers (void) {}
+void P_ArchiveThinkers (void) {}
+void P_ArchiveWorld (void) {}
+void P_UnArchivePlayers (void) {}
+void P_UnArchiveThinkers (void) {}
+void P_UnArchiveWorld (void) {}
+void P_ArchiveSpecials (void) {}
+void P_UnArchiveSpecials (void) {}
 

@@ -212,7 +212,7 @@ typedef struct
     char	name2[9];
     short	episode;
     
-} switchlist_t;
+} GCC_PACKED switchlist_t;
 
 
 typedef enum

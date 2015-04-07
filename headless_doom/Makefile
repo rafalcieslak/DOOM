@@ -1,17 +1,10 @@
-################################################################
-#
-# $Id:$
-#
-# $Log:$
-#
-CC=  gcc  # gcc or g++
-
-CFLAGS=-g -Wall -DNORMALUNIX -DLINUX # -DUSEASM 
-LDFLAGS=-L/usr/X11R6/lib
-LIBS=-lXext -lX11 -lnsl -lm
+CC=gcc
+CFLAGS2=-DHEADLESS -O0 -g -Wall -DFAIL_QUICKLY --save-temps $(CFLAGS)
+LDFLAGS=
+LIBS=
 
 # subdirectory for objects
-O=linux
+O=.
 
 # not too sophisticated dependency
 OBJS=				\
@@ -75,21 +68,18 @@ OBJS=				\
 		$(O)/s_sound.o		\
 		$(O)/z_zone.o			\
 		$(O)/info.o				\
-		$(O)/sounds.o
+		$(O)/sounds.o           \
+        $(O)/i_main.o
 
-all:	 $(O)/linuxxdoom
+all: doom1.exe
+
+doom1.exe: $(OBJS)
+	$(CC) -o doom1.exe $(OBJS) $(LDFLAGS) $(CFLAGS)
+
 
 clean:
-	rm -f *.o *~ *.flc
-	rm -f linux/*
-
-$(O)/linuxxdoom:	$(OBJS) $(O)/i_main.o
-	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) $(O)/i_main.o \
-	-o $(O)/linuxxdoom $(LIBS)
+	rm -f *.o *~ *.flc doom1.exe *.i
 
 $(O)/%.o:	%.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS2) -c $< -o $@
 
-#############################################################
-#
-#############################################################

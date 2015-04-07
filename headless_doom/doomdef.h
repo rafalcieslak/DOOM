@@ -26,6 +26,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#define GCC_PACKED __attribute__((packed))
+
 //
 // Global parameters/defines.
 //
@@ -81,8 +83,10 @@ typedef enum
 //  and unfinished. Default is synchronous.
 // Experimental asynchronous timer based is
 //  handled by SNDINTR. 
-#define SNDSERV  1
+//#define SNDSERV  1
 //#define SNDINTR  1
+#define FAKE_SOUND 1
+#define FAKE_TIME 1
 
 
 // This one switches between MIT SHM (no proper mouse)

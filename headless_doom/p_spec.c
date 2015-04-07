@@ -72,11 +72,11 @@ typedef struct
 //
 typedef struct
 {
-    boolean	istexture;	// if false, it is a flat
-    char	endname[9];
-    char	startname[9];
-    int		speed;
-} animdef_t;
+    signed char istexture /*GCC_PACKED*/ ;	// if false, it is a flat
+    char	endname[9] /*GCC_PACKED*/ ;
+    char	startname[9] /*GCC_PACKED*/ ;
+    int		speed GCC_PACKED ;
+} GCC_PACKED animdef_t;
 
 
 
@@ -1184,7 +1184,7 @@ int EV_DoDonut(line_t*	line)
 	s2 = getNextSector(s1->lines[0],s1);
 	for (i = 0;i < s2->linecount;i++)
 	{
-	    if ((!s2->lines[i]->flags & ML_TWOSIDED) ||
+	    if ((!(s2->lines[i]->flags & ML_TWOSIDED)) ||
 		(s2->lines[i]->backsector == s1))
 		continue;
 	    s3 = s2->lines[i]->backsector;

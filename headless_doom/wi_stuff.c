@@ -373,7 +373,7 @@ static patch_t*		items;
 static patch_t*		frags;
 
 // Time sucks.
-static patch_t*		time;
+static patch_t*		xtime;
 static patch_t*		par;
 static patch_t*		sucks;
 
@@ -518,7 +518,7 @@ void WI_initAnimatedBack(void)
 	// init variables
 	a->ctr = -1;
 
-	// specify the next time to draw it
+	// specify the next xtime to draw it
 	if (a->type == ANIM_ALWAYS)
 	    a->nexttic = bcnt + 1 + (M_Random()%a->period);
 	else if (a->type == ANIM_RANDOM)
@@ -681,7 +681,7 @@ WI_drawPercent
 
 
 //
-// Display level completion time and par,
+// Display level completion xtime and par,
 //  or "sucks" message if overflow.
 //
 void
@@ -1456,7 +1456,7 @@ void WI_drawStats(void)
     V_DrawPatch(SP_STATSX, SP_STATSY+2*lh, FB, sp_secret);
     WI_drawPercent(SCREENWIDTH - SP_STATSX, SP_STATSY+2*lh, cnt_secret[0]);
 
-    V_DrawPatch(SP_TIMEX, SP_TIMEY, FB, time);
+    V_DrawPatch(SP_TIMEX, SP_TIMEY, FB, xtime);
     WI_drawTime(SCREENWIDTH/2 - SP_TIMEX, SP_TIMEY, cnt_time);
 
     if (wbs->epsd < 3)
@@ -1668,8 +1668,8 @@ void WI_loadData(void)
     // ":"
     colon = W_CacheLumpName("WICOLON", PU_STATIC); 
 
-    // "time"
-    time = W_CacheLumpName("WITIME", PU_STATIC);   
+    // "xtime"
+    xtime = W_CacheLumpName("WITIME", PU_STATIC);   
 
     // "sucks"
     sucks = W_CacheLumpName("WISUCKS", PU_STATIC);  
@@ -1752,7 +1752,7 @@ void WI_unloadData(void)
     Z_ChangeTag(sp_secret, PU_CACHE);
     Z_ChangeTag(items, PU_CACHE);
     Z_ChangeTag(frags, PU_CACHE);
-    Z_ChangeTag(time, PU_CACHE);
+    Z_ChangeTag(xtime, PU_CACHE);
     Z_ChangeTag(sucks, PU_CACHE);
     Z_ChangeTag(par, PU_CACHE);
 

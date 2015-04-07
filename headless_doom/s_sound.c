@@ -164,7 +164,7 @@ void S_Init
 {  
   int		i;
 
-  fprintf( stderr, "S_Init: default sfx volume %d\n", sfxVolume);
+  /* fprintf( stderr, "S_Init: default sfx volume %d\n", sfxVolume); */
 
   // Whatever these did with DMX, these are rather dummies now.
   I_SetChannels();
@@ -364,6 +364,7 @@ S_StartSoundAtVolume
   if (sfx->lumpnum < 0)
     sfx->lumpnum = I_GetSfxLumpNum(sfx);
 
+#if 0
 #ifndef SNDSRV
   // cache data if necessary
   if (!sfx->data)
@@ -378,6 +379,7 @@ S_StartSoundAtVolume
     //       sfx_id, sfx->lumpnum, (int)sfx->data );
     
   }
+#endif
 #endif
   
   // increase the usefulness
@@ -651,7 +653,7 @@ S_ChangeMusic
 ( int			musicnum,
   int			looping )
 {
-    musicinfo_t*	music;
+    musicinfo_t*	music = NULL;
     char		namebuf[9];
 
     if ( (musicnum <= mus_None)

@@ -1857,6 +1857,8 @@ void M_Init (void)
     messageLastMenuActive = menuactive;
     quickSaveSlot = -1;
 
+    M_SizeDisplay(1);
+
     // Here we could catch other version dependencies,
     //  like HELP1/2, and four episodes.
 

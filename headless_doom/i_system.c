@@ -87,6 +87,11 @@ byte* I_ZoneBase (int*	size)
 //
 int  I_GetTime (void)
 {
+#ifdef FAKE_TIME
+    static int		bt=0;
+
+    return bt++;
+#else
     struct timeval	tp;
     struct timezone	tzp;
     int			newtics;
@@ -97,6 +102,7 @@ int  I_GetTime (void)
 	basetime = tp.tv_sec;
     newtics = (tp.tv_sec-basetime)*TICRATE + tp.tv_usec*TICRATE/1000000;
     return newtics;
+#endif
 }
 
 
@@ -125,6 +131,7 @@ void I_Quit (void)
 
 void I_WaitVBL(int count)
 {
+#if 0
 #ifdef SGI
     sginap(1);                                           
 #else
@@ -132,6 +139,7 @@ void I_WaitVBL(int count)
     sleep(0);
 #else
     usleep (count * (1000000/70) );                                
+#endif
 #endif
 #endif
 }
@@ -173,11 +181,11 @@ void I_Error (char *error, ...)
     fflush( stderr );
 
     // Shutdown. Here might be other errors.
-    if (demorecording)
-	G_CheckDemoStatus();
+    //if (demorecording)//X1
+	//G_CheckDemoStatus();//X1
 
-    D_QuitNetGame ();
-    I_ShutdownGraphics();
+    //D_QuitNetGame ();//X1
+    //I_ShutdownGraphics();//X1
     
     exit(-1);
 }

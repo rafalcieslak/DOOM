@@ -26,7 +26,7 @@ static const char
 rcsid[] = "$Id: w_wad.c,v 1.5 1997/02/03 16:47:57 b1 Exp $";
 
 
-#ifdef NORMALUNIX
+#ifdef HEADLESS  
 #include <ctype.h>
 #include <sys/types.h>
 #include <string.h>
@@ -34,8 +34,10 @@ rcsid[] = "$Id: w_wad.c,v 1.5 1997/02/03 16:47:57 b1 Exp $";
 #include <malloc.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-#include <alloca.h>
-#define O_BINARY		0
+/* #include <alloca.h>*/
+#endif
+#ifndef O_BINARY
+#define O_BINARY 0 
 #endif
 
 #include "doomtype.h"
@@ -66,12 +68,12 @@ void**			lumpcache;
 
 #define strcmpi	strcasecmp
 
-void strupr (char* s)
+void mystrupr (char* s)
 {
     while (*s) { *s = toupper(*s); s++; }
 }
 
-int filelength (int handle) 
+int myfilelength (int handle) 
 { 
     struct stat	fileinfo;
     
@@ -149,6 +151,7 @@ void W_AddFile (char *filename)
     filelump_t*		fileinfo;
     filelump_t		singleinfo;
     int			storehandle;
+    int rc;
     
     // open the file and add to directory
 
@@ -174,7 +177,7 @@ void W_AddFile (char *filename)
 	// single lump file
 	fileinfo = &singleinfo;
 	singleinfo.filepos = 0;
-	singleinfo.size = LONG(filelength(handle));
+	singleinfo.size = LONG(myfilelength(handle));
 	ExtractFileBase (filename, singleinfo.name);
 	numlumps++;
     }
@@ -367,7 +370,7 @@ int W_CheckNumForName (char* name)
     name8.s[8] = 0;
 
     // case insensitive
-    strupr (name8.s);		
+    mystrupr (name8.s);		
 
     v1 = name8.x[0];
     v2 = name8.x[1];
@@ -378,11 +381,11 @@ int W_CheckNumForName (char* name)
 
     while (lump_p-- != lumpinfo)
     {
-	if ( *(int *)lump_p->name == v1
-	     && *(int *)&lump_p->name[4] == v2)
-	{
-	    return lump_p - lumpinfo;
-	}
+        if ( *(int *)lump_p->name == v1
+             && *(int *)&lump_p->name[4] == v2)
+        {
+            return lump_p - lumpinfo;
+        }
     }
 
     // TFB. Not found.

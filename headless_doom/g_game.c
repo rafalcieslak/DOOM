@@ -74,6 +74,7 @@ rcsid[] = "$Id: g_game.c,v 1.8 1997/02/03 22:45:09 b1 Exp $";
 #define SAVEGAMESIZE	0x2c000
 #define SAVESTRINGSIZE	24
 
+extern unsigned headless_count;
 
 
 boolean	G_CheckDemoStatus (void); 
@@ -480,7 +481,8 @@ void G_DoLoadLevel (void)
 	    players[i].playerstate = PST_REBORN; 
 	memset (players[i].frags,0,sizeof(players[i].frags)); 
     } 
-		 
+	
+    printf ("%u setup level E%dM%d\n", headless_count, gameepisode, gamemap);
     P_SetupLevel (gameepisode, gamemap, 0, gameskill);    
     displayplayer = consoleplayer;		// view the guy you are playing    
     starttime = I_GetTime (); 
@@ -1578,19 +1580,23 @@ void G_DeferedPlayDemo (char* name)
     defdemoname = name; 
     gameaction = ga_playdemo; 
 } 
+
  
 void G_DoPlayDemo (void) 
 { 
     skill_t skill; 
     int             i, episode, map; 
+    int             ver ;
 	 
     gameaction = ga_nothing; 
     demobuffer = demo_p = W_CacheLumpName (defdemoname, PU_STATIC); 
-    if ( *demo_p++ != VERSION)
+    ver = *demo_p++ ;
+    if ( ver != VERSION)
     {
-      fprintf( stderr, "Demo is from a different game version!\n");
+      /*fprintf( stderr, "Demo is from a different game version!\n"
+        "Demo version %d, game version %d.\n" , ver, VERSION );
       gameaction = ga_nothing;
-      return;
+      return; */
     }
     
     skill = *demo_p++; 
@@ -1609,6 +1615,8 @@ void G_DoPlayDemo (void)
 	netgame = true; 
 	netdemo = true; 
     }
+
+   printf ("%u play demo E%dM%d skill %d\n", headless_count, episode, map, skill);
 
     // don't spend a lot of time in loadlevel 
     precache = false;

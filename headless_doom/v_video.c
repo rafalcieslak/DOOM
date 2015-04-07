@@ -179,7 +179,7 @@ V_CopyRect
 	|| (unsigned)srcscrn>4
 	|| (unsigned)destscrn>4)
     {
-	I_Error ("Bad V_CopyRect");
+        I_Error ("Bad V_CopyRect");
     }
 #endif 
     V_MarkRect (destx, desty, width, height); 

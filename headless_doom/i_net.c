@@ -27,6 +27,7 @@ rcsid[] = "$Id: m_bbox.c,v 1.1 1997/02/03 22:45:10 b1 Exp $";
 #include <string.h>
 #include <stdio.h>
 
+#if 0
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -34,6 +35,7 @@ rcsid[] = "$Id: m_bbox.c,v 1.1 1997/02/03 22:45:10 b1 Exp $";
 #include <unistd.h>
 #include <netdb.h>
 #include <sys/ioctl.h>
+#endif
 
 #include "i_system.h"
 #include "d_event.h"
@@ -49,8 +51,17 @@ rcsid[] = "$Id: m_bbox.c,v 1.1 1997/02/03 22:45:10 b1 Exp $";
 
 
 
+#undef htonl
+#undef htons
+#undef ntohl
+#undef ntohs
 
-
+#ifdef __BIG_ENDIAN__
+#define htonl(x) (x)
+#define htons(x) (x)
+#define ntohl(x) (x)
+#define ntohs(x) (x)
+#else
 // For some odd reason...
 #define ntohl(x) \
         ((unsigned long int)((((unsigned long int)(x) & 0x000000ffU) << 24) | \
@@ -64,6 +75,7 @@ rcsid[] = "$Id: m_bbox.c,v 1.1 1997/02/03 22:45:10 b1 Exp $";
 	  
 #define htonl(x) ntohl(x)
 #define htons(x) ntohs(x)
+#endif
 
 void	NetSend (void);
 boolean NetListen (void);
@@ -73,16 +85,17 @@ boolean NetListen (void);
 // NETWORKING
 //
 
-int	DOOMPORT =	(IPPORT_USERRESERVED +0x1d );
+//int	DOOMPORT =	(IPPORT_USERRESERVED +0x1d );
 
 int			sendsocket;
 int			insocket;
 
-struct	sockaddr_in	sendaddress[MAXNETNODES];
+//struct	sockaddr_in	sendaddress[MAXNETNODES];
 
 void	(*netget) (void);
 void	(*netsend) (void);
 
+#if 0
 
 //
 // UDPsocket
@@ -146,9 +159,9 @@ void PacketSend (void)
     }
 		
     //printf ("sending %i\n",gametic);		
-    c = sendto (sendsocket , &sw, doomcom->datalength
+    c = 0;/*sendto (sendsocket , &sw, doomcom->datalength
 		,0,(void *)&sendaddress[doomcom->remotenode]
-		,sizeof(sendaddress[doomcom->remotenode]));
+		,sizeof(sendaddress[doomcom->remotenode]));*/
 	
     //	if (c == -1)
     //		I_Error ("SendPacket error: %s",strerror(errno));
@@ -167,8 +180,8 @@ void PacketGet (void)
     doomdata_t		sw;
 				
     fromlen = sizeof(fromaddress);
-    c = recvfrom (insocket, &sw, sizeof(sw), 0
-		  , (struct sockaddr *)&fromaddress, &fromlen );
+    c = -1; /*recvfrom (insocket, &sw, sizeof(sw), 0
+		  , (struct sockaddr *)&fromaddress, &fromlen ); */
     if (c == -1 )
     {
 	if (errno != EWOULDBLOCK)
@@ -218,7 +231,6 @@ void PacketGet (void)
 }
 
 
-
 int GetLocalAddress (void)
 {
     char		hostname[1024];
@@ -238,6 +250,8 @@ int GetLocalAddress (void)
 }
 
 
+#endif 
+
 //
 // I_InitNetwork
 //
@@ -246,7 +260,7 @@ void I_InitNetwork (void)
     boolean		trueval = true;
     int			i;
     int			p;
-    struct hostent*	hostentry;	// host information entry
+    //struct hostent*	hostentry;	// host information entry
 	
     doomcom = malloc (sizeof (*doomcom) );
     memset (doomcom, 0, sizeof(*doomcom) );
@@ -269,6 +283,7 @@ void I_InitNetwork (void)
     else
 	doomcom-> extratics = 0;
 		
+#if 0
     p = M_CheckParm ("-port");
     if (p && p<myargc-1)
     {
@@ -280,6 +295,7 @@ void I_InitNetwork (void)
     //  -net <consoleplayer> <host> <host> ...
     i = M_CheckParm ("-net");
     if (!i)
+#endif
     {
 	// single player game
 	netgame = false;
@@ -290,6 +306,7 @@ void I_InitNetwork (void)
 	return;
     }
 
+#if 0
     netsend = PacketSend;
     netget = PacketGet;
     netgame = true;
@@ -298,7 +315,7 @@ void I_InitNetwork (void)
     doomcom->consoleplayer = myargv[i+1][0]-'1';
 
     doomcom->numnodes = 1;	// this node for sure
-	
+
     i++;
     while (++i < myargc && myargv[i][0] != '-')
     {
@@ -311,11 +328,14 @@ void I_InitNetwork (void)
 	}
 	else
 	{
+		I_Error ("not implemented");
+#if 0
 	    hostentry = gethostbyname (myargv[i]);
 	    if (!hostentry)
 		I_Error ("gethostbyname: couldn't find %s", myargv[i]);
 	    sendaddress[doomcom->numnodes].sin_addr.s_addr 
 		= *(int *)hostentry->h_addr_list[0];
+#endif
 	}
 	doomcom->numnodes++;
     }
@@ -329,8 +349,10 @@ void I_InitNetwork (void)
     ioctl (insocket, FIONBIO, &trueval);
 
     sendsocket = UDPsocket ();
+#endif
 }
 
+#if 0
 
 void I_NetCmd (void)
 {
@@ -346,3 +368,4 @@ void I_NetCmd (void)
 	I_Error ("Bad net cmd: %i\n",doomcom->command);
 }
 
+#endif
