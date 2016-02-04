@@ -62,6 +62,7 @@ Typical benchmark timings (benchmark.exe):
     Windows x86 (Core i5 2500)  4.7.4       6.8s
     Linux x64 (Core i3 3220)    4.7.2       6.9s
     Linux x86 (Core i3 3220)    4.1.2       7.5s
+    Linux PowerPC (E500)        4.9.2       81.4s
 
     (test.exe typically requires 25% more time)
 
