@@ -4,6 +4,8 @@ it for testing compilers, CPU simulators, FPGA hardware, timing analysis
 software and a coverage testing tool. It is written in C, with some
 GCC extensions, and is portable to any 32/64-bit platform supported by GCC.
 
+![Partially-rendered frame from E1M3](pic.png)
+
 Over nearly ten years, I used versions of "Headless Doom" on 
 x86 Linux, x64 Linux, x86 Windows, Microblaze (bare metal) and 
 ARM Linux (RPi, RPi model 2, and Pandaboard). It uses the original 
@@ -17,7 +19,7 @@ Jack Whitham, April 2015
 
 
 
-Requirements:
+# Requirements:
 
 To run the benchmark or the test, you will need Ultimate Doom.
 This should contain the "doom.wad" data file, with md5 sum:
@@ -34,7 +36,7 @@ http://quake.speeddemosarchive.com/quake/qdq/movies/ddq.html
 
 
 
-Instructions:
+# Instructions:
 
 Run "make" to compile.
 
@@ -51,7 +53,7 @@ mode can be used to detect subtle software and hardware errors.
 
 
 
-Typical benchmark timings (benchmark.exe):
+# Typical benchmark timings (benchmark.exe):
 
     Platform                    GCC         Typical time
 
@@ -65,4 +67,23 @@ Typical benchmark timings (benchmark.exe):
     Linux PowerPC (E500)        4.9.2       81.4s
 
     (test.exe typically requires 25% more time)
+
+
+
+# Videos:
+
+The Doom Done Quick demo may be watched here:
+   https://www.youtube.com/watch?v=oZGRL8-bhhw
+
+(This is not a recording of Headless Doom, which spends less time on the
+title screens etc.)
+
+Doom's rendering process is shown here:
+   https://www.youtube.com/watch?v=ujXrQVyl610
+
+(This is Headless Doom running on a PowerPC E500 with execution slowed by
+a factor of 16667, so that 60 microseconds of CPU time is one second of
+video time. You can see how the game draws the walls, floor and sprites. See
+also: http://blog.jwhitham.org/2016/03/a-detailed-timing-trace-with-video.html )
+
 
