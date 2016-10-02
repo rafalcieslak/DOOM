@@ -521,17 +521,17 @@ void D_AddFile (char *file)
 void IdentifyVersion (void)
 {
 
-    char*	doom1wad = NULL;
-    char*	doomwad = NULL;
-    char*	doomuwad = NULL;
-    char*	doom2wad = NULL;
+    //char*	doom1wad = NULL;
+    //char*	doomwad = NULL;
+    //char*	doomuwad = NULL;
+    //char*	doom2wad = NULL;
 
-    char*	doom2fwad = NULL;
-    char*	plutoniawad = NULL;
-    char*	tntwad = NULL;
+    //char*	doom2fwad = NULL;
+    //char*	plutoniawad = NULL;
+    //char*	tntwad = NULL;
 
 #ifdef HEADLESS  
-    char *home;
+    //char *home;
     char *doomwaddir;
     /*doomwaddir = getenv("DOOMWADDIR");
     if (!doomwaddir)*/
@@ -788,7 +788,6 @@ void goodbye (void)
 
 int main(int argc, char ** argv)
 {
-    int rc;
     atexit (goodbye);
     headless_count = 0;
 #pragma RVS add_statement ("RVS_Init()");

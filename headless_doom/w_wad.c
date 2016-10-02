@@ -149,7 +149,6 @@ void W_AddFile (char *filename)
     filelump_t*		fileinfo;
     filelump_t		singleinfo;
     int			storehandle;
-    int rc;
     
     // open the file and add to directory
 

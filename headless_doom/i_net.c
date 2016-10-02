@@ -255,9 +255,9 @@ int GetLocalAddress (void)
 //
 void I_InitNetwork (void)
 {
-    boolean		trueval = true;
+    //boolean		trueval = true;
     int			i;
-    int			p;
+    //int			p;
     //struct hostent*	hostentry;	// host information entry
 	
     doomcom = malloc (sizeof (*doomcom) );

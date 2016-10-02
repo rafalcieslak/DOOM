@@ -79,7 +79,7 @@ P_GiveAmmo
     if (ammo == am_noammo)
 	return false;
 		
-    if (ammo < 0 || ammo > NUMAMMO)
+    if ((int) ammo < 0 || ammo > NUMAMMO)
 	I_Error ("P_GiveAmmo: bad type %i", ammo);
 		
     if ( player->ammo[ammo] == player->maxammo[ammo]  )
@@ -172,7 +172,7 @@ P_GiveWeapon
     boolean	gaveweapon;
 	
     if (netgame
-	&& (deathmatch!=2)
+	&& (((int) deathmatch)!=2)
 	 && !dropped )
     {
 	// leave placed weapons forever on net games

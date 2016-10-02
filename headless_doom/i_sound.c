@@ -401,7 +401,7 @@ void I_SetChannels()
   int		i;
   int		j;
     
-  int*	steptablemid = steptable + 128;
+  //int*	steptablemid = steptable + 128;
   
   // Okay, reset internal mixing channels to zero.
   /*for (i=0; i<NUM_CHANNELS; i++)
