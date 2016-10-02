@@ -1,13 +1,14 @@
 
 "Headless Doom" is a benchmark/test program based on Doom. I have used
 it for testing compilers, CPU simulators, FPGA hardware, timing analysis
-software and a coverage testing tool. It is written in C, with some
-GCC extensions, and is portable to any 32/64-bit platform supported by GCC.
+software and a coverage testing tool. It is written in C, with some GCC
+extensions, and is portable to any 32/64-bit platform supported by
+GCC or Clang.
 
 ![Partially-rendered frame from E1M3](pic.png)
 
 Over nearly ten years, I used versions of "Headless Doom" on 
-x86 Linux, x64 Linux, x86 Windows, Microblaze (bare metal) and 
+x86 Linux, x64 Linux, x86 Windows, Microblaze (bare metal), Android and 
 ARM Linux (RPi, RPi model 2, and Pandaboard). It uses the original 
 source code release from id Software, with some bug fixes and 
 modifications of my own. This source code is demo-compatible with
@@ -55,19 +56,19 @@ mode can be used to detect subtle software and hardware errors.
 
 # Typical benchmark timings (benchmark.exe):
 
-    Platform                    GCC         Typical time
+    Platform                     Compiler        Typical time
 
-    RPi 2 (ARMv7 1GHz)          4.6.3       77.3s
-    RPi (ARMv6 700MHz)          4.6.3       217.1s
-    Linux x86 (Core2 E8600)     4.7.2       10.3s
-    Linux x64 (Core2 E8600)     4.7.2       9.4s
-    Windows x86 (Core i5 2500)  4.7.4       6.8s
-    Linux x64 (Core i3 3220)    4.7.2       6.9s
-    Linux x86 (Core i3 3220)    4.1.2       7.5s
-    Linux PowerPC (E500)        4.9.2       81.4s
+    RPi 2 (ARMv7 1GHz)           GCC 4.6.3       77.3s
+    RPi (ARMv6 700MHz)           GCC 4.6.3       217.1s
+    Linux x86 (Core2 E8600)      GCC 4.7.2       10.3s
+    Linux x64 (Core2 E8600)      GCC 4.7.2       9.4s
+    Windows x86 (Core i5 2500)   GCC 4.7.4       6.8s
+    Linux x64 (Core i3 3220)     GCC 4.7.2       6.9s
+    Linux x86 (Core i3 3220)     GCC 4.1.2       7.5s
+    Linux PowerPC (E500)         GCC 4.9.2       81.4s
+    Android 6.0 (Snapdragon 410) Clang 3.9.0     69.3s
 
     (test.exe typically requires 25% more time)
-
 
 
 # Videos:
