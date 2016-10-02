@@ -479,7 +479,7 @@ void G_DoLoadLevel (void)
     { 
 	if (playeringame[i] && players[i].playerstate == PST_DEAD) 
 	    players[i].playerstate = PST_REBORN; 
-	memset (players[i].frags,0,sizeof(players[i].frags)); 
+	memset (players[i].frags,0,sizeof(int) * MAXPLAYERS); 
     } 
 	
     printf ("%u setup level E%dM%d\n", headless_count, gameepisode, gamemap);
@@ -490,12 +490,12 @@ void G_DoLoadLevel (void)
     Z_CheckHeap ();
     
     // clear cmd building stuff
-    memset (gamekeydown, 0, sizeof(gamekeydown)); 
+    memset (gamekeydown, 0, sizeof(boolean) * NUMKEYS); 
     joyxmove = joyymove = 0; 
     mousex = mousey = 0; 
     sendpause = sendsave = paused = false; 
-    memset (mousebuttons, 0, sizeof(mousebuttons)); 
-    memset (joybuttons, 0, sizeof(joybuttons)); 
+    memset (mousebuttons, 0, sizeof(boolean) * 3); 
+    memset (joybuttons, 0, sizeof(boolean) * 4); 
 } 
  
  
@@ -1215,7 +1215,7 @@ void G_DoLoadGame (void)
     // skip the description field 
     memset (vcheck,0,sizeof(vcheck)); 
     sprintf (vcheck,"version %i",VERSION); 
-    if (strcmp (save_p, vcheck)) 
+    if (strcmp ((char *) save_p, vcheck)) 
 	return;				// bad version 
     save_p += VERSIONSIZE; 
 			 
