@@ -32,6 +32,7 @@
 #include <malloc.h>
 #include <fcntl.h>
 #include <sys/stat.h>
+#include <stdlib.h>
 /* #include <alloca.h>*/
 #endif
 #ifndef O_BINARY
@@ -48,7 +49,7 @@
 #endif
 #include "w_wad.h"
 
-
+extern int ignore;
 
 
 
@@ -181,7 +182,7 @@ void W_AddFile (char *filename)
     else 
     {
 	// WAD file
-	read (handle, &header, sizeof(header));
+	ignore = read (handle, &header, sizeof(header));
 	if (strncmp(header.identification,"IWAD",4))
 	{
 	    // Homebrew levels?
@@ -198,7 +199,7 @@ void W_AddFile (char *filename)
 	length = header.numlumps*sizeof(filelump_t);
 	fileinfo = alloca (length);
 	lseek (handle, header.infotableofs, SEEK_SET);
-	read (handle, fileinfo, length);
+	ignore = read (handle, fileinfo, length);
 	numlumps += header.numlumps;
     }
 
@@ -249,13 +250,13 @@ void W_Reload (void)
     if ( (handle = open (reloadname,O_RDONLY | O_BINARY)) == -1)
 	I_Error ("W_Reload: couldn't open %s",reloadname);
 
-    read (handle, &header, sizeof(header));
+    ignore = read (handle, &header, sizeof(header));
     lumpcount = LONG(header.numlumps);
     header.infotableofs = LONG(header.infotableofs);
     length = lumpcount*sizeof(filelump_t);
     fileinfo = alloca (length);
     lseek (handle, header.infotableofs, SEEK_SET);
-    read (handle, fileinfo, length);
+    ignore = read (handle, fileinfo, length);
     
     // Fill in lumpinfo
     lump_p = &lumpinfo[reloadlump];
@@ -378,8 +379,8 @@ int W_CheckNumForName (char* name)
 
     while (lump_p-- != lumpinfo)
     {
-        if ( *(int *)lump_p->name == v1
-             && *(int *)&lump_p->name[4] == v2)
+	const int * name_p = (int *)lump_p->name;
+        if ( name_p[0] == v1 && name_p[1] == v2)
         {
             return lump_p - lumpinfo;
         }
@@ -477,7 +478,7 @@ W_CacheLumpNum
 ( int		lump,
   int		tag )
 {
-    byte*	ptr;
+    //byte*	ptr;
 
     if ((unsigned)lump >= numlumps)
 	I_Error ("W_CacheLumpNum: %i >= numlumps",lump);
@@ -487,7 +488,7 @@ W_CacheLumpNum
 	// read the lump in
 	
 	//printf ("cache miss on lump %i\n",lump);
-	ptr = Z_Malloc (W_LumpLength (lump), tag, &lumpcache[lump]);
+	(void) Z_Malloc (W_LumpLength (lump), tag, &lumpcache[lump]);
 	W_ReadLump (lump, lumpcache[lump]);
     }
     else

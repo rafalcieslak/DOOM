@@ -67,6 +67,7 @@ mode can be used to detect subtle software and hardware errors.
     Linux x86 (Core i3 3220)     GCC 4.1.2       7.5s
     Linux PowerPC (E500)         GCC 4.9.2       81.4s
     Android 6.0 (Snapdragon 410) Clang 3.9.0     69.3s
+    W10 Linux x64 (AMD A6-6310)  GCC 4.8.4       17.1s
 
     (test.exe typically requires 25% more time)
 

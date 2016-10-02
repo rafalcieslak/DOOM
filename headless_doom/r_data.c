@@ -24,6 +24,7 @@
 //-----------------------------------------------------------------------------
 
 #include <stdint.h>
+#include <stdlib.h>
 
 #include "i_system.h"
 #include "z_zone.h"
@@ -185,9 +186,9 @@ R_DrawColumnInCache
     int		count;
     int		position;
     byte*	source;
-    byte*	dest;
+    //byte*	dest;
 	
-    dest = (byte *)cache + 3;
+    //dest = (byte *)cache + 3;
 	
     while (patch->topdelta != 0xff)
     {

@@ -103,6 +103,8 @@ boolean         drone;
 
 boolean		singletics = true; // debug flag to cancel adaptiveness
 
+int ignore;
+
 
 
 //extern int soundVolume;
@@ -532,10 +534,10 @@ void IdentifyVersion (void)
 
 #ifdef HEADLESS  
     //char *home;
-    char *doomwaddir;
+    //char *doomwaddir;
     /*doomwaddir = getenv("DOOMWADDIR");
     if (!doomwaddir)*/
-	doomwaddir = ".";
+//	doomwaddir = ".";
 
 #if 0
     // Commercial.
@@ -715,7 +717,7 @@ void FindResponseFile (void)
 	    size = ftell(handle);
 	    fseek (handle,0,SEEK_SET);
 	    file = malloc (size);
-	    fread (file,size,1,handle);
+	    ignore = fread (file,size,1,handle);
 	    fclose (handle);
 			
 	    // KEEP ALL CMDLINE ARGS FOLLOWING @RESPONSEFILE ARG

@@ -32,6 +32,7 @@
 #endif
 
 
+extern int ignore;
 
 #define MAXWADFILES             20
 extern char*		wadfiles[MAXWADFILES];
