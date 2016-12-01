@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // $Id:$
@@ -22,8 +22,6 @@
 //
 //-----------------------------------------------------------------------------
 
-
-
 #ifdef __GNUG__
 #pragma implementation "doomdef.h"
 #endif
@@ -32,5 +30,3 @@
 // Location for any defines turned variables.
 
 // None.
-
-

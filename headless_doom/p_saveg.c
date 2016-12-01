@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // $Id:$
@@ -21,22 +21,21 @@
 //
 //-----------------------------------------------------------------------------
 
-
 #include "i_system.h"
-#include "z_zone.h"
 #include "p_local.h"
+#include "z_zone.h"
 
 // State.
 #include "doomstat.h"
 #include "r_state.h"
 
-byte*		save_p;
+byte *save_p;
 
 #if 0
 
 // Pads save_p to a 4-byte boundary
 //  so that the load/save works on SGI&Gecko.
-#define PADSAVEP()	save_p += (4 - ((int) save_p & 3)) & 3
+#define PADSAVEP() save_p += (4 - ((int)save_p & 3)) & 3
 
 
 
@@ -584,12 +583,11 @@ void P_UnArchiveSpecials (void)
 }
 #endif
 
-void P_ArchivePlayers (void) {}
-void P_ArchiveThinkers (void) {}
-void P_ArchiveWorld (void) {}
-void P_UnArchivePlayers (void) {}
-void P_UnArchiveThinkers (void) {}
-void P_UnArchiveWorld (void) {}
-void P_ArchiveSpecials (void) {}
-void P_UnArchiveSpecials (void) {}
-
+void P_ArchivePlayers(void) {}
+void P_ArchiveThinkers(void) {}
+void P_ArchiveWorld(void) {}
+void P_UnArchivePlayers(void) {}
+void P_UnArchiveThinkers(void) {}
+void P_UnArchiveWorld(void) {}
+void P_ArchiveSpecials(void) {}
+void P_UnArchiveSpecials(void) {}
