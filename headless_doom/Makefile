@@ -1,7 +1,7 @@
-CC=gcc
-CFLAGS2=-DHEADLESS -O2 -g -Wall  $(CFLAGS)
-LDFLAGS=
-LIBS=
+CC= mipsel-unknown-elf-gcc -mips32r2 -EL
+CFLAGS2= -DMIMIKER -DHEADLESS -O0 -g -Wall  $(CFLAGS)
+LDFLAGS= -T ../../mimiker.ld
+LIBS= -lc -lgcc ../../libsyscalls.a -lc ../../start.o
 
 # subdirectory for objects
 O=.
@@ -70,14 +70,14 @@ OBJS=				\
 		$(O)/sounds.o           \
         $(O)/i_main.o
 
-all: benchmark.exe test.exe \
+all: benchmark.uelf test.uelf \
     doom.wad.ok DDQ-EP1.LMP DDQ-EP2.LMP DDQ-EP3.LMP DDQ-EP4.LMP
 
-benchmark.exe: $(OBJS) i_video_benchmark.o
-	$(CC) -o benchmark.exe $(OBJS) i_video_benchmark.o $(LDFLAGS) $(CFLAGS)
+benchmark.uelf: $(OBJS) i_video_benchmark.o
+	$(CC) -o benchmark.uelf $(OBJS) i_video_benchmark.o $(LDFLAGS) $(CFLAGS) $(LIBS)
 
-test.exe: $(OBJS) crc.o i_video_test.o
-	$(CC) -o test.exe $(OBJS) $(LDFLAGS) crc.o i_video_test.o $(CFLAGS)
+test.uelf: $(OBJS) crc.o i_video_test.o
+	$(CC) -o test.uelf $(OBJS) $(LDFLAGS) crc.o i_video_test.o $(CFLAGS) $(LIBS)
 
 doom.wad:
 	@echo ""

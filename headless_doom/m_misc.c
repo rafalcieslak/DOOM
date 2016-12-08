@@ -448,6 +448,12 @@ void WritePCXfile(char *filename, byte *data, int width, int height,
 // M_ScreenShot
 //
 void M_ScreenShot(void) {
+  
+#ifdef MIMIKER
+  // Screenshots are disabled, as they require write access to files.
+  return;
+#endif
+  
   int i;
   byte *linear;
   char lbmname[12];
