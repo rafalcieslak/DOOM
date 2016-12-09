@@ -1,10 +1,10 @@
 CC= mipsel-unknown-elf-gcc -mips32r2 -EL
 CFLAGS2= -DMIMIKER -DHEADLESS -O0 -g -Wall  $(CFLAGS)
-LDFLAGS= -T ../../mimiker.ld
-LIBS= -lc -lgcc ../../libsyscalls.a -lc ../../start.o
+LDFLAGS= -T ../mimiker.ld
+LIBS= -lc -lgcc ../syscalls.o -lc ../start.o
 
 # subdirectory for objects
-O=.
+O=headless_doom
 
 # not too sophisticated dependency
 OBJS=				\
@@ -73,11 +73,11 @@ OBJS=				\
 all: benchmark.uelf test.uelf \
     doom.wad.ok DDQ-EP1.LMP DDQ-EP2.LMP DDQ-EP3.LMP DDQ-EP4.LMP
 
-benchmark.uelf: $(OBJS) i_video_benchmark.o
-	$(CC) -o benchmark.uelf $(OBJS) i_video_benchmark.o $(LDFLAGS) $(CFLAGS) $(LIBS)
+benchmark.uelf: $(OBJS) $(O)/i_video_benchmark.o
+	$(CC) -o benchmark.uelf $(OBJS) $(O)/i_video_benchmark.o $(LDFLAGS) $(CFLAGS) $(LIBS)
 
-test.uelf: $(OBJS) crc.o i_video_test.o
-	$(CC) -o test.uelf $(OBJS) $(LDFLAGS) crc.o i_video_test.o $(CFLAGS) $(LIBS)
+test.uelf: $(OBJS) $(O)/crc.o $(O)/i_video_test.o
+	$(CC) -o test.uelf $(OBJS) $(LDFLAGS) $(O)/crc.o $(O)/i_video_test.o $(CFLAGS) $(LIBS)
 
 doom.wad:
 	@echo ""
@@ -98,8 +98,8 @@ DDQ-EP3.LMP: DDQ-EP2.LMP
 DDQ-EP4.LMP: DDQ-EP3.LMP
 
 clean:
-	rm -f *.o *~ *.flc test.exe benchmark.exe *.i doom.wad.ok
+	rm -f $(O)/*.o *~ *.flc test.uelf benchmark.uelf *.i doom.wad.ok DDQ*
 
-$(O)/%.o:	%.c
+$(O)/%.o:	$(O)/%.c
 	$(CC) $(CFLAGS2) -c $< -o $@
 
