@@ -1,4 +1,8 @@
 
+This is a port of Headless Doom to [Mimiker](http://github.com/cahirwpz/mimiker).
+
+---
+
 "Headless Doom" is a benchmark/test program based on Doom. I have used
 it for testing compilers, CPU simulators, FPGA hardware, timing analysis
 software and a coverage testing tool. It is written in C, with some GCC
