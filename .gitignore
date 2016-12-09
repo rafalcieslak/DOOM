@@ -1,0 +1,5 @@
+*.o
+*.uelf
+doom.wad
+DDQ*
+*~
