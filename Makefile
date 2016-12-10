@@ -6,6 +6,8 @@ LIBS= -lc -lgcc ../syscalls.o -lc ../start.o
 # subdirectory for objects
 O=headless_doom
 
+EMBED_BENCH_NAME = DOOM_benchmark
+
 # not too sophisticated dependency
 OBJS=				\
 		$(O)/doomdef.o		\
@@ -70,7 +72,7 @@ OBJS=				\
 		$(O)/sounds.o           \
         $(O)/i_main.o
 
-all: benchmark.uelf test.uelf \
+all: benchmark.uelf benchmark.uelf.o test.uelf \
     doom.wad.ok DDQ-EP1.LMP DDQ-EP2.LMP DDQ-EP3.LMP DDQ-EP4.LMP
 
 benchmark.uelf: $(OBJS) $(O)/i_video_benchmark.o
@@ -103,3 +105,8 @@ clean:
 $(O)/%.o:	$(O)/%.c
 	$(CC) $(CFLAGS2) -c $< -o $@
 
+benchmark.uelf.o: benchmark.uelf Makefile
+	mipsel-unknown-elf-objcopy -I binary --rename-section .data=.rodata,contents,readonly,data -O elf32-little --alt-machine-code=8 $< $@
+	mipsel-unknown-elf-objcopy --redefine-sym _binary_benchmark_uelf_start=_binary_$(EMBED_BENCH_NAME)_uelf_start $@
+	mipsel-unknown-elf-objcopy --redefine-sym _binary_benchmark_uelf_end=_binary_$(EMBED_BENCH_NAME)_uelf_end $@
+	mipsel-unknown-elf-objcopy --redefine-sym _binary_benchmark_uelf_size=_binary_$(EMBED_BENCH_NAME)_uelf_size $@
