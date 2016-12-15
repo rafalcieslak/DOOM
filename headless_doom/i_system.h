@@ -29,6 +29,12 @@
 #pragma interface
 #endif
 
+
+#ifdef MIMIKER
+#undef O_BINARY
+#define O_BINARY 0
+#endif
+
 // Called by DoomMain.
 void I_Init(void);
 

@@ -73,7 +73,8 @@ OBJS=				\
         $(O)/i_main.o
 
 all: benchmark.uelf benchmark.uelf.o test.uelf \
-    doom.wad.ok DDQ-EP1.LMP DDQ-EP2.LMP DDQ-EP3.LMP DDQ-EP4.LMP
+    doom.wad.ok DDQ-EP1.LMP DDQ-EP2.LMP DDQ-EP3.LMP DDQ-EP4.LMP \
+	doom.wad.eo DDQ-EP1.LMP.eo DDQ-EP2.LMP.eo DDQ-EP3.LMP.eo DDQ-EP4.LMP.eo
 
 benchmark.uelf: $(OBJS) $(O)/i_video_benchmark.o
 	$(CC) -o benchmark.uelf $(OBJS) $(O)/i_video_benchmark.o $(LDFLAGS) $(CFLAGS) $(LIBS)
@@ -104,6 +105,11 @@ clean:
 
 $(O)/%.o:	$(O)/%.c
 	$(CC) $(CFLAGS2) -c $< -o $@
+
+%.eo: %
+	@echo "[LD] $(DIR)$< -> $(DIR)$@"
+	mipsel-unknown-elf-objcopy -I binary --rename-section .data=.rodata,contents,readonly,data -O elf32-little --alt-machine-code=8 $< $@
+
 
 benchmark.uelf.o: benchmark.uelf Makefile
 	mipsel-unknown-elf-objcopy -I binary --rename-section .data=.rodata,contents,readonly,data -O elf32-little --alt-machine-code=8 $< $@

@@ -504,6 +504,15 @@ if (!doomwaddir)*/
   sprintf(basedefault, "doomrc");
 #endif
 
+#ifdef MIMIKER
+  gamemode = retail;
+  D_AddFile("/embed/doom.wad");
+  D_AddFile("/embed/DDQ-EP1.LMP");
+  D_AddFile("/embed/DDQ-EP2.LMP");
+  D_AddFile("/embed/DDQ-EP3.LMP");
+  D_AddFile("/embed/DDQ-EP4.LMP");
+#else
+  
 #if 1
   gamemode = retail;
   D_AddFile("doom.wad");
@@ -600,6 +609,8 @@ if (!doomwaddir)*/
   gamemode = indetermined;
 #endif
 
+#endif /* MIMIKER */
+  
   // We don't abort. Let's see what the PWAD contains.
   // exit(1);
   // I_Error ("Game mode indeterminate\n");

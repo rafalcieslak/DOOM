@@ -23,23 +23,8 @@
 
 #include <stdlib.h>
 #include <unistd.h>
-#if 0
-#include <sys/ipc.h>
-#include <sys/shm.h>
-
 #include <fcntl.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-
-#include <stdarg.h>
-#include <sys/socket.h>
-#include <sys/time.h>
-#include <sys/types.h>
-
-#include <errno.h>
-#include <netinet/in.h>
-#include <signal.h>
-#endif
+#include <assert.h>
 
 #include "d_main.h"
 #include "doomstat.h"
@@ -79,10 +64,16 @@ void I_UpdateNoBlit(void) {
   // what is this?
 }
 
+int palette_handle;
+int fb_handle;
+
 //
 // I_FinishUpdate
 //
-void I_FinishUpdate(void) { headless_count++; }
+void I_FinishUpdate(void) {  
+  write(fb_handle, screens[0], 320*200);
+  headless_count++;
+}
 
 //
 // I_ReadScreen
@@ -98,7 +89,9 @@ void I_ReadScreen(byte *scr) {
 //
 // I_SetPalette
 //
-void I_SetPalette(byte *palette) {}
+void I_SetPalette(byte *palette) {
+  write(palette_handle, palette, 3*256);
+}
 
 void I_InitGraphics(void) {
   static int firsttime = 1;
@@ -109,5 +102,9 @@ void I_InitGraphics(void) {
   firsttime = 0;
 
   screens[0] = (unsigned char *)malloc(SCREENWIDTH * SCREENHEIGHT);
-  printf("Headless Doom running in Benchmark mode\n");
+  printf("Headless Doom running in CAHIR-OS mode\n");
+
+  palette_handle = open("/dev/vga/palette", O_WRONLY, 0);
+  fb_handle = open("/dev/vga/fb", O_WRONLY, 0);
+  assert(palette_handle >=0 && fb_handle >= 0);
 }
