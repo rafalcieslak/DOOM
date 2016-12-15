@@ -139,8 +139,6 @@ void W_AddFile(char *filename) {
     reloadlump = numlumps;
   }
 
-  printf("flag1: %d\n", O_RDONLY);
-  printf("flag2: %d\n", O_BINARY);
   if ((handle = open(filename, O_RDONLY | O_BINARY)) == -1) {
     printf(" couldn't open %s\n", filename);
     return;
