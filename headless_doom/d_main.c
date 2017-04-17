@@ -506,11 +506,11 @@ if (!doomwaddir)*/
 
 #ifdef MIMIKER
   gamemode = retail;
-  D_AddFile("/embed/doom.wad");
-  D_AddFile("/embed/DDQ-EP1.LMP");
-  D_AddFile("/embed/DDQ-EP2.LMP");
-  D_AddFile("/embed/DDQ-EP3.LMP");
-  D_AddFile("/embed/DDQ-EP4.LMP");
+  D_AddFile("/opt/doom.wad");
+  D_AddFile("/opt/DDQ-EP1.LMP");
+  D_AddFile("/opt/DDQ-EP2.LMP");
+  D_AddFile("/opt/DDQ-EP3.LMP");
+  D_AddFile("/opt/DDQ-EP4.LMP");
 #else
   
 #if 1
