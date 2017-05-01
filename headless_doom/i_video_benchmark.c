@@ -66,12 +66,55 @@ void I_UpdateNoBlit(void) {
   // what is this?
 }
 
-/* Scancode to event. */
+/* Scancode to event. See: http://wiki.osdev.org/PS/2_Keyboard */
 event_t events_by_simple_scancodes[256] = {
-    [0x1f] = (event_t){.type = ev_keydown,
-                       .data1 = KEY_DOWNARROW}, // Actually, this is S!
-    [0x9f] = (event_t){.type = ev_keyup,
-                       .data1 = KEY_DOWNARROW}, // Actually, this is S!
+  [0x1c] = (event_t){.type = ev_keydown, .data1 = KEY_ENTER},
+  [0x9c] = (event_t){.type = ev_keyup, .data1 = KEY_ENTER},
+  [0x01] = (event_t){.type = ev_keydown, .data1 = KEY_ESCAPE},
+  [0x81] = (event_t){.type = ev_keyup, .data1 = KEY_ESCAPE},
+  [0x0f] = (event_t){.type = ev_keydown, .data1 = KEY_TAB},
+  [0x8f] = (event_t){.type = ev_keyup, .data1 = KEY_TAB},
+  [0x1d] = (event_t){.type = ev_keydown, .data1 = KEY_RCTRL},
+  [0x9d] = (event_t){.type = ev_keyup, .data1 = KEY_RCTRL},
+  [0x38] = (event_t){.type = ev_keydown, .data1 = KEY_LALT},
+  [0xb8] = (event_t){.type = ev_keyup, .data1 = KEY_LALT},
+  [0x2a] = (event_t){.type = ev_keydown, .data1 = KEY_RSHIFT},
+  [0xaa] = (event_t){.type = ev_keyup, .data1 = KEY_RSHIFT},
+  [0x36] = (event_t){.type = ev_keydown, .data1 = KEY_RSHIFT},
+  [0xb6] = (event_t){.type = ev_keyup, .data1 = KEY_RSHIFT},
+  [0x39] = (event_t){.type = ev_keydown, .data1 = ' '},
+  [0xb9] = (event_t){.type = ev_keyup, .data1 = ' '},
+  [0x15] = (event_t){.type = ev_keydown, .data1 = 'y'},
+  [0x95] = (event_t){.type = ev_keyup, .data1 = 'y'},
+  [0x31] = (event_t){.type = ev_keydown, .data1 = 'n'},
+  [0xb1] = (event_t){.type = ev_keyup, .data1 = 'n'},
+  [0x02] = (event_t){.type = ev_keydown, .data1 = '1'},
+  [0x82] = (event_t){.type = ev_keyup, .data1 = '1'},
+  [0x03] = (event_t){.type = ev_keydown, .data1 = '2'},
+  [0x83] = (event_t){.type = ev_keyup, .data1 = '2'},
+  [0x04] = (event_t){.type = ev_keydown, .data1 = '3'},
+  [0x84] = (event_t){.type = ev_keyup, .data1 = '3'},
+  [0x05] = (event_t){.type = ev_keydown, .data1 = '4'},
+  [0x85] = (event_t){.type = ev_keyup, .data1 = '4'},
+  [0x06] = (event_t){.type = ev_keydown, .data1 = '5'},
+  [0x86] = (event_t){.type = ev_keyup, .data1 = '5'},
+  [0x07] = (event_t){.type = ev_keydown, .data1 = '6'},
+  [0x87] = (event_t){.type = ev_keyup, .data1 = '6'},
+  [0x08] = (event_t){.type = ev_keydown, .data1 = '7'},
+  [0x88] = (event_t){.type = ev_keyup, .data1 = '7'},
+};
+
+event_t events_by_ext_scancodes[256] = {
+  [0x50] = (event_t){.type = ev_keydown, .data1 = KEY_DOWNARROW},
+  [0xd0] = (event_t){.type = ev_keyup, .data1 = KEY_DOWNARROW},
+  [0x48] = (event_t){.type = ev_keydown, .data1 = KEY_UPARROW},
+  [0xc8] = (event_t){.type = ev_keyup, .data1 = KEY_UPARROW},
+  [0x4b] = (event_t){.type = ev_keydown, .data1 = KEY_LEFTARROW},
+  [0xcb] = (event_t){.type = ev_keyup, .data1 = KEY_LEFTARROW},
+  [0x4d] = (event_t){.type = ev_keydown, .data1 = KEY_RIGHTARROW},
+  [0xcd] = (event_t){.type = ev_keyup, .data1 = KEY_RIGHTARROW},
+  [0x1d] = (event_t){.type = ev_keydown, .data1 = KEY_RCTRL},
+  [0x9d] = (event_t){.type = ev_keyup, .data1 = KEY_RCTRL},
 };
 
 int palette_handle;
@@ -82,13 +125,15 @@ void I_GetEvents(void) {
   if (sc_handle < 0)
     return;
   unsigned char buf[100];
+  event_t ev;
   unsigned n = read(sc_handle, buf, 100);
   for (unsigned i = 0; i < n; i++) {
     if (buf[i] == 0xe0) {
-      i += 2; // Skip extended for now.
-      continue;
+      i++;
+      ev = events_by_ext_scancodes[buf[i]];
+    }else{
+      ev = events_by_simple_scancodes[buf[i]];
     }
-    event_t ev = events_by_simple_scancodes[buf[i]];
     if (ev.data1 == 0)
       continue; // Unrecognized key
 

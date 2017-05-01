@@ -354,12 +354,12 @@ void D_DoAdvanceDemo(void) {
   paused = false;
   gameaction = ga_nothing;
 
-#if 0
-    if ( gamemode == retail )
-      demosequence = (demosequence+1)%7;
-    else
-      demosequence = (demosequence+1)%6;
-#endif
+
+  if ( gamemode == retail )
+    demosequence = (demosequence+1)%7;
+  else
+    demosequence = (demosequence+1)%6;
+  
   demosequence++;
   printf("demo sequence %d\n", demosequence);
 
@@ -378,7 +378,7 @@ void D_DoAdvanceDemo(void) {
       S_StartMusic(mus_intro);
     break;
   case 1:
-    G_DeferedPlayDemo("DDQ-EP1");
+    G_DeferedPlayDemo("demo1");
     break;
   case 2:
     pagetic = 200;
@@ -387,7 +387,7 @@ void D_DoAdvanceDemo(void) {
     pagetic = 5;
     break;
   case 3:
-    G_DeferedPlayDemo("DDQ-EP2");
+    G_DeferedPlayDemo("demo2");
     break;
   case 4:
     gamestate = GS_DEMOSCREEN;
@@ -406,11 +406,11 @@ void D_DoAdvanceDemo(void) {
     pagetic = 5;
     break;
   case 5:
-    G_DeferedPlayDemo("DDQ-EP3");
+    G_DeferedPlayDemo("demo3");
     break;
   // THE DEFINITIVE DOOM Special Edition demo
   case 6:
-    G_DeferedPlayDemo("DDQ-EP4");
+    G_DeferedPlayDemo("demo4");
     break;
   default:
     printf("end of demos\n");
@@ -507,10 +507,10 @@ if (!doomwaddir)*/
 #ifdef MIMIKER
   gamemode = retail;
   D_AddFile("/opt/doom.wad");
-  D_AddFile("/opt/DDQ-EP1.LMP");
-  D_AddFile("/opt/DDQ-EP2.LMP");
-  D_AddFile("/opt/DDQ-EP3.LMP");
-  D_AddFile("/opt/DDQ-EP4.LMP");
+//  D_AddFile("/opt/DDQ-EP1.LMP");
+//  D_AddFile("/opt/DDQ-EP2.LMP");
+//  D_AddFile("/opt/DDQ-EP3.LMP");
+//  D_AddFile("/opt/DDQ-EP4.LMP");
 #else
   
 #if 1
