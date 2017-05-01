@@ -1,7 +1,6 @@
 CC= mipsel-unknown-elf-gcc -mips32r2 -EL
-CFLAGS2= -DMIMIKER -DHEADLESS -O0 -g -Wall  $(CFLAGS)
-LDFLAGS= -T ../mimiker.ld
-LIBS= -lc -lgcc ../syscalls.o -lc ../start.o
+CFLAGS2= --sysroot=../sysroot -DMIMIKER -DHEADLESS -O0 -g -Wall  $(CFLAGS)
+LDFLAGS= --sysroot=../sysroot -L= -T mimiker.ld
 
 # subdirectory for objects
 O=headless_doom

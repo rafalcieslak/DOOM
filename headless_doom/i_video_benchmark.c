@@ -40,12 +40,13 @@
 
 extern unsigned headless_count;
 
-void I_ShutdownGraphics(void) {}
-
-void I_StartFrame(void) {}
-
-void I_GetEvent(void) { /* Where events would be received from the X server */
+void I_ShutdownGraphics(void) {
 }
+
+void I_StartFrame(void) {
+}
+
+void I_GetEvents();
 
 //
 // I_StartTic
@@ -55,6 +56,7 @@ void I_StartTic(void) {
    * the queue) and stop the mouse pointer leaving the window
    * as a dirty keep-focus hack
    */
+  I_GetEvents();
 }
 
 //
@@ -64,33 +66,48 @@ void I_UpdateNoBlit(void) {
   // what is this?
 }
 
+/* Scancode to event. */
+event_t events_by_simple_scancodes[256] = {
+    [0x1f] = (event_t){.type = ev_keydown,
+                       .data1 = KEY_DOWNARROW}, // Actually, this is S!
+    [0x9f] = (event_t){.type = ev_keyup,
+                       .data1 = KEY_DOWNARROW}, // Actually, this is S!
+};
+
 int palette_handle;
 int fb_handle;
+int sc_handle;
 
-//
-// I_FinishUpdate
-//
-void I_FinishUpdate(void) {  
-  write(fb_handle, screens[0], 320*200);
-  headless_count++;
+void I_GetEvents(void) {
+  if (sc_handle < 0)
+    return;
+  unsigned char buf[100];
+  unsigned n = read(sc_handle, buf, 100);
+  for (unsigned i = 0; i < n; i++) {
+    if (buf[i] == 0xe0) {
+      i += 2; // Skip extended for now.
+      continue;
+    }
+    event_t ev = events_by_simple_scancodes[buf[i]];
+    if (ev.data1 == 0)
+      continue; // Unrecognized key
+
+    D_PostEvent(&ev);
+  }
 }
 
-//
-// I_ReadScreen
-//
+void I_FinishUpdate(void) {
+  lseek(fb_handle, 0, 0);
+  write(fb_handle, screens[0], 320 * 200);
+  headless_count++;
+}
 void I_ReadScreen(byte *scr) {
   memcpy(scr, screens[0], SCREENWIDTH * SCREENHEIGHT);
 }
 
-//
-// Palette stuff.
-//
-
-//
-// I_SetPalette
-//
 void I_SetPalette(byte *palette) {
-  write(palette_handle, palette, 3*256);
+  lseek(palette_handle, 0, 0);
+  write(palette_handle, palette, 3 * 256);
 }
 
 void I_InitGraphics(void) {
@@ -106,5 +123,6 @@ void I_InitGraphics(void) {
 
   palette_handle = open("/dev/vga/palette", O_WRONLY, 0);
   fb_handle = open("/dev/vga/fb", O_WRONLY, 0);
-  assert(palette_handle >=0 && fb_handle >= 0);
+  sc_handle = open("/dev/scancode", O_RDONLY, 0);
+  assert(palette_handle >= 0 && fb_handle >= 0);
 }
