@@ -1,6 +1,7 @@
-CC= mipsel-unknown-elf-gcc -mips32r2 -EL
-CFLAGS2= --sysroot=../sysroot -DMIMIKER -DHEADLESS -O0 -g -Wall  $(CFLAGS)
-LDFLAGS= --sysroot=../sysroot -L= -T mimiker.ld
+CC= mipsel-mimiker-elf-gcc -mips32r2 -EL
+SYSROOT= ../../sysroot
+CFLAGS= --sysroot=../../sysroot -DMIMIKER -DHEADLESS -O0 -g -Wall
+LDFLAGS= --sysroot=../../sysroot -L= -T mimiker.ld
 
 # subdirectory for objects
 O=headless_doom
@@ -71,14 +72,10 @@ OBJS=				\
 		$(O)/sounds.o           \
         $(O)/i_main.o
 
-all: benchmark.uelf test.uelf \
-    doom.wad.ok DDQ-EP1.LMP DDQ-EP2.LMP DDQ-EP3.LMP DDQ-EP4.LMP
+all: benchmark.uelf doom.wad.ok DDQ-EP1.LMP DDQ-EP2.LMP DDQ-EP3.LMP DDQ-EP4.LMP
 
 benchmark.uelf: $(OBJS) $(O)/i_video_benchmark.o
 	$(CC) -o benchmark.uelf $(OBJS) $(O)/i_video_benchmark.o $(LDFLAGS) $(CFLAGS) $(LIBS)
-
-test.uelf: $(OBJS) $(O)/crc.o $(O)/i_video_test.o
-	$(CC) -o test.uelf $(OBJS) $(LDFLAGS) $(O)/crc.o $(O)/i_video_test.o $(CFLAGS) $(LIBS)
 
 doom.wad:
 	@echo ""
@@ -102,4 +99,12 @@ clean:
 	rm -f $(O)/*.o *~ *.flc test.uelf benchmark.uelf *.i doom.wad.ok DDQ*
 
 $(O)/%.o:	$(O)/%.c
-	$(CC) $(CFLAGS2) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
+
+install: all
+	@echo "[INSTALL] benchmark.uelf -> /bin/doom"
+	install -D -T benchmark.uelf $(SYSROOT)/bin/doom
+	@echo "[INSTALL] doom.wad -> /opt/doom.wad"
+	install -D doom.wad $(SYSROOT)/opt/
+	@echo "[INSTALL] *.LMP -> /opt/*.LMP"
+	install -D *.LMP $(SYSROOT)/opt/

@@ -43,7 +43,7 @@
 
 // Timer stuff. Experimental.
 #include <errno.h>
-#include <signal.h>
+#include <sys/signal.h>
 #include <time.h>
 
 #include "z_zone.h"
